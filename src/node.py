@@ -44,4 +44,5 @@ class blockchain():
 
 
 b.__add__(test)
+b
 b.Blockchain_arr.get(1)
