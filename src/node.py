@@ -5,8 +5,8 @@ import datetime
 import array as arr
 import os.path
 
-class readHostFile():
-    def readIp_node(nodeNumber):
+
+def readIp_node(nodeNumber):
         filename = "../config/host_node"+str(nodeNumber)
         if not os.path.isfile(filename):
             print("File does not exist")
@@ -18,7 +18,7 @@ class readHostFile():
                 ip_address = ip_address[1]
 
         return ip_address
-    def readIp_reg(nodeNumber):
+def readIp_reg(nodeNumber):
         filename = "../config/host_node"+str(nodeNumber)
         if not os.path.isfile(filename):
             print("File does not exist")
@@ -30,7 +30,7 @@ class readHostFile():
                 ip_address = ip_address[1]
 
         return ip_address
-    def readIp_neighbors(nodeNumber):
+def readIp_neighbors(nodeNumber):
         filename = "../config/host_node"+str(nodeNumber)
         if not os.path.isfile(filename):
             print("File does not exist")
@@ -64,11 +64,18 @@ class block():
         i = str(index) + str(amount) + str(timestamp_nostri) + receiver + sender + PrevHash
         ans = hash(i)
         return (ans)
-
-
-
 # ---------------------------------------------------------------------------------
 
+
+
+def blockToText():
+    block.index
+    text =str(block.index)
+    return text
+
+    # def textToBlock():
+    #     block_fromText = block;
+    #     return block_fromText
 
 
 
@@ -79,14 +86,16 @@ class blockchain():
     def __init__(self):
         self.Blockchain_arr = []
 
-    def __add__(self, block):
-        self.Blockchain_arr.append(block)
+    def __add__(self, block_add):
+        #add the given block to the blockchain
+        self.Blockchain_arr.append(block_add)
 
     def get_lastblock(self):
+        #return a copy of the last block opbject
         a=self.Blockchain_arr[self.Blockchain_arr.__len__()-1]
         return (a)
     def controle(self,block_incomming):
-
+        #function that gives back 0 or 1, to check if a block may be added to the blockchain
         if self.get_lastblock().Hash==block_incomming.PrevHash and (self.get_lastblock().index+1)==block_incomming.index :
             if block_incomming.Hash_calculate(block_incomming.index,block_incomming.amount,block_incomming.timestamp,block_incomming.receiver,block_incomming.sender,block_incomming.PrevHash)==block_incomming.Hash:
                 return 1
@@ -94,18 +103,23 @@ class blockchain():
 
         else:
             return 0
+    def controle_add(self,block_incomming):
+        #controle if block may be added, if yes add
+        if self.controle(block_incomming):
+            self.__add__(block_incomming)
+        else:
+            index=b.get_lastblock().index
+            print("blok not added, should be blok"+str(index+1))
 
 
 
 
-print("sdsd")
+
 b = blockchain()
-
 blok1 = block(1, 4, datetime.datetime.now(), "kakak", "sender", "zeze")
 b.__add__(blok1)
-blok2 = block(2, 4, datetime.datetime.now(), "Ruben", "sender", b.get_lastblock().Hash)
-if b.controle(blok2):
-    b.__add__(blok2)
+blok2 = block(4, 4, datetime.datetime.now(), "Ruben", "sender", b.get_lastblock().Hash)
+b.controle_add(blok2)
 
 
 
