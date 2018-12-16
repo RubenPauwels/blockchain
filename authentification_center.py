@@ -2,7 +2,7 @@ import _thread
 import socket
 import uuid
 
-#Homooooo's
+#Homooooo
 
 def client_thread(socket):
     data = s.recv(1024)
