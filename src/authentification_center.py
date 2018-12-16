@@ -22,10 +22,19 @@ class user():
 
 def client_thread(conn, ip):
     input_text = read_connection(conn)
-    username='test'
+    username='ulrik'
+    for  x in users:
+        if username == x.username:
+            user = x
+            break
 
+    send_connection(conn,user.getNonce())# send it to client
+    hashReceive = read_connection(conn)
+    if(user.check(hashReceive)) :
+        send_connection("accept")
+    else :
+        send_connection("not accept")
 
-    send_connection(conn,"send back same from server:"+input_text)# send it to client
     conn.close()  # close connection
     print('Connection ' + str(ip) + ':' + str(portNumber)+ " ended")
 
@@ -75,5 +84,6 @@ def readUserFile():
         users.append(user(values[0],values[1]))
 
 readUserFile()
+
 print('nonce '+str(users[0].getNonce()))
 print('user '+str(users[0].username)+' pasword '+str(users[0].password)+' nonce '+str(users[0].nonce))

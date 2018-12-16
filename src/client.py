@@ -15,6 +15,7 @@ clients_input = input("What you want to proceed my dear client?\n") #read from t
 send_connection(soc,clients_input) # we must encode the string to bytes
 
 result_string = read_connection(soc)
+soc.close();
 
 
 print("Result from server is {}".format(result_string))
