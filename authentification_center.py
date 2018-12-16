@@ -2,6 +2,8 @@ import _thread
 import socket
 import uuid
 
+#Homooooo's
+
 def client_thread(socket):
     data = s.recv(1024)
     if data:
