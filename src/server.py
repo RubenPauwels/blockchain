@@ -1,24 +1,23 @@
 import socket
-import lib
+from src.lib import *
 
 def client_thread(conn, ip):
-    input_from_client = lib.read_connection(conn)
+    input_text = read_connection(conn)
 
-    #vysl = res.encode("utf8")  # encode the result string
-    #conn.sendall(vysl)  # send it to client
+    send_connection(conn,"send back same from server:"+input_text)# send it to client
     conn.close()  # close connection
-    print('Connection ' + ip + ':' + lib.portNumber+ " ended")
+    print('Connection ' + str(ip) + ':' + str(portNumber)+ " ended")
 
 
 def start_server():
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # this is for easy starting/killing the app
     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    print('Socket created')
+    print('Socket created on')
 
-    ipaddress = "127.0.0.1"
+    ipaddress = "127.0.0.2"
     try:
-        soc.bind((ipaddress, lib.portNumber))
+        soc.bind((ipaddress, portNumber))
         print('Socket bind complete')
     except socket.error as msg:
         import sys
@@ -27,7 +26,7 @@ def start_server():
 
     #Start listening on socket
     soc.listen(10)
-    print('Socket now listening')
+    print('Socket now listening on '+str(ipaddress))
 
     # for handling task in separate jobs we need threading
     from threading import Thread

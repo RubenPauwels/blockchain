@@ -25,5 +25,5 @@ def read_connection(conn):
     print('receive '+text)
     return text
 
-def send_connection(conn, MAX_BUFFER_SIZE, text):
-    conn.send(text)
+def send_connection(conn, text):
+    conn.sendall(text.encode("utf8"))
