@@ -5,8 +5,8 @@ import datetime
 import array as arr
 import os.path
 
-class readHostFile():
-    def readIp_node(nodeNumber):
+
+def readIp_node(nodeNumber):
         filename = "../config/host_node"+str(nodeNumber)
         if not os.path.isfile(filename):
             print("File does not exist")
@@ -18,7 +18,7 @@ class readHostFile():
                 ip_address = ip_address[1]
 
         return ip_address
-    def readIp_reg(nodeNumber):
+def readIp_reg(nodeNumber):
         filename = "../config/host_node"+str(nodeNumber)
         if not os.path.isfile(filename):
             print("File does not exist")
@@ -30,7 +30,7 @@ class readHostFile():
                 ip_address = ip_address[1]
 
         return ip_address
-    def readIp_neighbors(nodeNumber):
+def readIp_neighbors(nodeNumber):
         filename = "../config/host_node"+str(nodeNumber)
         if not os.path.isfile(filename):
             print("File does not exist")
@@ -64,17 +64,18 @@ class block():
         i = str(index) + str(amount) + str(timestamp_nostri) + receiver + sender + PrevHash
         ans = hash(i)
         return (ans)
+# ---------------------------------------------------------------------------------
 
-    def blockToText():
-        text = "Zever"
-        return text
-    print(blockToText())
+
+
+def blockToText():
+    block.index
+    text =str(block.index)
+    return text
+
     # def textToBlock():
     #     block_fromText = block;
     #     return block_fromText
-
-# ---------------------------------------------------------------------------------
-
 
 
 
