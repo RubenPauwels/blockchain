@@ -1,10 +1,26 @@
 import _thread
 import socket
+import lib
 import uuid
 
 #http://danielhnyk.cz/simple-server-client-aplication-python-3/
 
 
+def read_from_client(conn,MAX_BUFFER_SIZE):
+    # the input is in bytes, so decode it
+    input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
+
+    # MAX_BUFFER_SIZE is how big the message can be
+    # this is test if it's sufficiently big
+    import sys
+    siz = sys.getsizeof(input_from_client_bytes)
+    if siz >= MAX_BUFFER_SIZE:
+        print("The length of input is probably too long: {}".format(siz))
+
+    # decode input and strip the end of line
+    input_from_client = input_from_client_bytes.decode("utf8").rstrip()
+    print('receive '+input_from_client)
+    return input_from_client
 
 def do_some_stuffs_with_input(input_string):
     """
@@ -16,26 +32,11 @@ def do_some_stuffs_with_input(input_string):
     print("Processing that nasty input!")
     return input_string[::-1]
 
-def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
+def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 10):
+    input_from_client = read_from_client(conn, MAX_BUFFER_SIZE)
 
-    # the input is in bytes, so decode it
-    input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
-
-    # MAX_BUFFER_SIZE is how big the message can be
-    # this is test if it's sufficiently big
-    import sys
-    siz = sys.getsizeof(input_from_client_bytes)
-    if  siz >= MAX_BUFFER_SIZE:
-        print("The length of input is probably too long: {}".format(siz))
-
-    # decode input and strip the end of line
-    input_from_client = input_from_client_bytes.decode("utf8").rstrip()
-
-    res = do_some_stuffs_with_input(input_from_client)
-    print("Result of processing {} is: {}".format(input_from_client, res))
-
-    vysl = res.encode("utf8")  # encode the result string
-    conn.sendall(vysl)  # send it to client
+    #vysl = res.encode("utf8")  # encode the result string
+    #conn.sendall(vysl)  # send it to client
     conn.close()  # close connection
     print('Connection ' + ip + ':' + port + " ended")
 
@@ -48,7 +49,7 @@ def start_server():
     print('Socket created')
 
     try:
-        soc.bind(("127.0.0.1", 12345))
+        soc.bind(("127.0.0.1", lib.portNumber))
         print('Socket bind complete')
     except socket.error as msg:
         import sys
