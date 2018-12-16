@@ -59,6 +59,17 @@ def readIp_neighbors(nodeNumber):
 
         return ip_address_neighbors
 
+ #input 1-6#list of ip numbers of neighbors
+def readUser(nodeNumber):
+        filename = "../config/host_node"+str(nodeNumber)
+        if not os.path.isfile(filename):
+            print("File does not exist "+filename)
+        else:
+            with open(filename) as f:
+                content = f.readlines()
+                name = content[2].split('=')[1].translate({ord(c): None for c in ' \n"'})
+                secr = content[6].split('=')[1].translate({ord(c): None for c in ' \n"'})
+        return user(name,secr)
 
 #-----------------------------------------
 def authentification():
@@ -66,8 +77,7 @@ def authentification():
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     soc.connect((ipAuthentification, portNumber))
-    thisUser = user('user1' , 'unicorn')
-
+    thisUser = readUser(NUMBER_NODE)
 
     send_connection(soc,thisUser.username)  #send username to auth center
     nonce = read_connection(soc)    #receive nonce
@@ -178,10 +188,9 @@ blok2 = block(4, 4, dateTime, "Ruben", "sender", b.get_lastblock().hash)
 b.controle_add(blok2)
 
 print(b.get_lastblock().receiver)
-
+authentification()
 
 if False:
-    def sendBlock():
     s="rer"
     #client starts the conversesion
     #####################
@@ -219,7 +228,8 @@ def askIndex_threat(i):
     last4ofhashblockchain=tempp[-4:]
 
     if int(content[0])==b.get_lastblock().index and last4ofhashblockchain==content[1]:
-        abortmission =  # sqd#
+        vfvd='h'
+        #abortmission =  # sqd#
     else:
         # send block to server
         test = "sd"
