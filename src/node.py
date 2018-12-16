@@ -36,7 +36,8 @@ class blockchain():
         self.Blockchain_arr.append(block)
 
     def get_Hash_lastblock(self):
-        self.Blockchain_arr.
+        self.Blockchain_arr
+        aa="s"
         return aa
 
 
