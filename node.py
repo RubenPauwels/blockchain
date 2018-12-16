@@ -29,6 +29,6 @@ class blockchain():
         self.Blockchain_arr.append(block)
 
 
-Blockchain_arr=[]
-Blockchain_arr.append("qsd")
-print Blockchain_arr
+b=blockchain()
+b.__add__(test)
+b.Blockchain_arr.get(1).
