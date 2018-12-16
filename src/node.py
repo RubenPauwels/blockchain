@@ -68,6 +68,7 @@ class block():
     def blockToText():
         text = "Zever"
         return text
+    print(blockToText())
     # def textToBlock():
     #     block_fromText = block;
     #     return block_fromText
