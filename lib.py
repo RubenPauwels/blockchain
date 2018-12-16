@@ -10,7 +10,7 @@ portNumber = 5001
 MAX_BUFFER_SIZE=4096
 
 #return the input of socket as text
-def read_socket(conn):
+def read_connection(conn):
     # the input is in bytes, so decode it
     input = conn.recv(MAX_BUFFER_SIZE)
 
@@ -25,5 +25,5 @@ def read_socket(conn):
     print('receive '+text)
     return text
 
-def end_socket(conn, MAX_BUFFER_SIZE, text):
+def send_connection(conn, MAX_BUFFER_SIZE, text):
     conn.send(text)
