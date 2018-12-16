@@ -65,7 +65,12 @@ class block():
         ans = hash(i)
         return (ans)
 
-
+    def blockToText():
+        text = "Zever"
+        return text
+    # def textToBlock():
+    #     block_fromText = block;
+    #     return block_fromText
 
 # ---------------------------------------------------------------------------------
 
