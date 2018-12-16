@@ -19,9 +19,9 @@ c="kkkkk"
 d=5
 ff= b+c+str(d)
 print ff
-ts=4
-ts=datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-print
+
+ts = datetime.datetime.now()
+print str(ts)+c
 
 if False:
 
