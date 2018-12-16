@@ -32,14 +32,6 @@ class block():
 
 
 
-def controle (b, block):
-    # voor het toevoegen, controleren of de hash's goed zijn
-    # step 4 verification
-    if b.get_Hash_lastblock() == block.get_PrevHash():
-        integrity = 1
-    else:
-        integrity = 0
-
 
 # ----------------------
 
@@ -57,22 +49,24 @@ class blockchain():
     def controle(self,block_incomming):
 
         if self.get_lastblock().Hash==block_incomming.PrevHash and (self.get_lastblock().index+1)==block_incomming.index :
-            if block_incomming.Hash_calculate()==block_incomming.Hash:
-                self.Blockchain_arr.append(block_incomming)
+            if block_incomming.Hash_calculate(block_incomming.index,block_incomming.amount,block_incomming.timestamp,block_incomming.receiver,block_incomming.sender,block_incomming.PrevHash)==block_incomming.Hash:
                 return 1
+
+
         else:
             return 0
 
 
 
 
-
+print("sdsd")
 b = blockchain()
 
 blok1 = block(1, 4, datetime.datetime.now(), "kakak", "sender", "zeze")
 b.__add__(blok1)
-#blok2 = block(2, 4, datetime.datetime.now(), "Ruben", "sender", b.get_lastblock().Hash)
-#b.controle(blok2)
+blok2 = block(2, 4, datetime.datetime.now(), "Ruben", "sender", b.get_lastblock().Hash)
+if b.controle(blok2):
+    b.__add__(blok2)
 
 
 
