@@ -3,7 +3,7 @@ import hashlib
 import sys
 
 #input  a string
-def hash(text):
+def generateHash(text):
      return hashlib.sha256(text.encode()).hexdigest()
 
 portNumber = 5001
@@ -27,3 +27,4 @@ def read_connection(conn):
 
 def send_connection(conn, text):
     conn.sendall(text.encode("utf8"))
+
