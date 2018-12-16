@@ -22,8 +22,15 @@ test=block(2,4,datetime.datetime.now(),"kakak","sender","zeze")
 print test.Hash
 print test.timestamp
 
-def controle ():
+def controle (b,block):
     #voor het toevoegen, controleren of de hash's goed zijn
+    #step 4 verification
+    if b.get_Hash_lastblock = block.get_Hash
+        integrity = 1;
+    else
+        integrity = 0;
+    return integrity
+
 #----------------------
 class blockchain():
     def __init__(self):
