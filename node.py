@@ -2,6 +2,7 @@ import lib
 import datetime
 import array as arr
 #----------------------------------------------------------------------------------
+b=blockchain()
 class block():
     #this is a block
     def __init__(self,index,amount,timestamp_nostri,receiver,sender,PrevHash):
@@ -12,10 +13,11 @@ class block():
         self.receiver=receiver
         self.sender=sender
         self.PrevHash=PrevHash #hash of the previous block
-
+        #we putt everything together
         i=str(index)+str(amount)+str(timestamp_nostri)+receiver+sender+PrevHash
-
         self.Hash=lib.hash(i)
+    def get_LastHash(self,):
+        return Hash
 #----------------------------------------------------------------------------------
 
 test=block(2,4,datetime.datetime.now(),"kakak","sender","zeze")
@@ -25,13 +27,20 @@ print test.timestamp
 def controle ():
     #voor het toevoegen, controleren of de hash's goed zijn
 #----------------------
+
+
 class blockchain():
     def __init__(self):
         self.Blockchain_arr=[]
     def __add__(self, block):
         self.Blockchain_arr.append(block)
 
+    def get_Hash_lastblock(self):
+        self.Blockchain_arr.
+        return aa
 
-b=blockchain()
+
+
+
 b.__add__(test)
 b.Blockchain_arr.get(1)
