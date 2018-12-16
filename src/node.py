@@ -31,6 +31,7 @@ def controle (b,block):
         integrity = 1;
     else
         integrity = 0;
+    #if integrity = 1 -> continue blockchain
     return integrity
 
 #----------------------
