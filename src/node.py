@@ -180,14 +180,6 @@ b.controle_add(blok2)
 print(b.get_lastblock().receiver)
 
 
-if False:
-    def sendBlock():
-    s="rer"
-    #client starts the conversesion
-    #####################
-    #from server to client
-    #send to all neighbours
-    #from clint to server
 
 
 
