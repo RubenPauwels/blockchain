@@ -20,7 +20,11 @@ class block():
         # we putt everything together
         i=str(index)+str(amount)+str(timestamp_nostri)+receiver +sender+ PrevHash
         self.Hash=hash(i)
+    def Hash_calculate(self ,index ,amount ,timestamp_nostri ,receiver ,sender ,PrevHash):
 
+        i = str(index) + str(amount) + str(timestamp_nostri) + receiver + sender + PrevHash
+        ans = hash(i)
+        return (ans)
 
 
 
@@ -50,22 +54,26 @@ class blockchain():
     def get_lastblock(self):
         a=self.Blockchain_arr[self.Blockchain_arr.__len__()-1]
         return (a)
+    def controle(self,block_incomming):
+
+        if self.get_lastblock().Hash==block_incomming.PrevHash and (self.get_lastblock().index+1)==block_incomming.index :
+            if block_incomming.Hash_calculate()==block_incomming.Hash:
+                self.Blockchain_arr.append(block_incomming)
+                return 1
+        else:
+            return 0
+
 
 
 
 
 b = blockchain()
 
-test = block(2, 4, datetime.datetime.now(), "kakak", "sender", "zeze")
-print(test.Hash)
-
-b.__add__(test)
-test = block(1, 4, datetime.datetime.now(), "kaskak", "sender", "zeze")
-b.__add__(test)
+blok1 = block(1, 4, datetime.datetime.now(), "kakak", "sender", "zeze")
+b.__add__(blok1)
+#blok2 = block(2, 4, datetime.datetime.now(), "Ruben", "sender", b.get_lastblock().Hash)
+#b.controle(blok2)
 
 
 
-
-print(test.Hash)
-
-print(b.get_lastblock().Hash)
+print(b.get_lastblock().receiver)
