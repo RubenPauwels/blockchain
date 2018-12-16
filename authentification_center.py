@@ -5,7 +5,7 @@ def thread_client(conn):
     
 
 
-
+#Homoooooo's
 
 #https://docs.python.org/2/howto/sockets.html
 #create an INET, STREAMing socket
