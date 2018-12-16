@@ -1,4 +1,5 @@
 import lib
+import datetime
 class block():
     #this is a block
     def __init__(self,index,amount,timestamp,receiver,sender,PrevHash):
@@ -8,9 +9,23 @@ class block():
         self.receiver=receiver
         self.sender=sender
         self.PrevHash=PrevHash
-        self.Hash="sqd"
 
+        i=str(index)+str(amount)
 
+        self.Hash=lib.hash("sqd")
 
-a=block(2,4,23,"kakak","sender","zeze")
-print lib.hash("sqd")
+b="rubesdn"
+c="kkkkk"
+d=5
+ff= b+c+str(d)
+print ff
+
+ts = datetime.datetime.now()
+print str(ts)+c
+
+if False:
+
+    blockk=block(2,4,23,"kakak","sender","zeze")
+
+    print lib.hash("sqd")
+
