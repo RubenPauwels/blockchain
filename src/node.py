@@ -59,7 +59,34 @@ def readIp_neighbors(nodeNumber):
 
         return ip_address_neighbors
 
+
+#-----------------------------------------
+def authentification():
+
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    soc.connect((ipAuthentification, portNumber))
+    thisUser = user('user1' , 'unicorn')
+
+
+    send_connection(soc,thisUser.username)  #send username to auth center
+    nonce = read_connection(soc)    #receive nonce
+    send_connection(soc,thisUser.setNonce(nonce))   #send back hash
+
+    answer = read_connection(soc)
+    print(answer)
+
+    soc.close();
+    return answer=="accept"
+
+
+
 # ----------------------------------------------------------------------------------
+
+
+
+
+
 
 class block():
     # this is a block
@@ -181,7 +208,7 @@ def askIndex_threat(i):
     soc.connect((iPaddresssServer, src.lib.portNumber))
     #what to send
     clients_input="a"
-    send_connection(soc, clients_input)  # we must encode the string to bytes
+    send_connection(soc, clients_input)  #send the input via the socket
 
     #what received
     result_string = read_connection(soc)
@@ -192,8 +219,8 @@ def askIndex_threat(i):
     last4ofhashblockchain=tempp[-4:]
 
     if int(content[0])==b.get_lastblock().index and last4ofhashblockchain==content[1]:
-        #send block to server
-        test="sd"
+        abortmission =  # sqd#
     else:
-        abortmission=#sqd#
+        # send block to server
+        test = "sd"
     soc.close();

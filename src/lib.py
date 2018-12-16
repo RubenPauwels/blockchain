@@ -11,8 +11,9 @@ portNumber = 5001
 MAX_BUFFER_SIZE=4096
 ipAuthentification = "127.0.0.10"
 
-#return the input of socket as text
-def read_connection(conn):
+
+#return the input of socket as bytes
+def read_bytes(conn):
     # the input is in bytes, so decode it
     input = conn.recv(MAX_BUFFER_SIZE)
 
@@ -22,10 +23,19 @@ def read_connection(conn):
     if siz >= MAX_BUFFER_SIZE:
         print("The length of input is probably too long: {}".format(siz))
 
+    return input
+
+
+#return the input of socket as text
+def read_connection(conn):
     # decode input and strip the end of line
-    text = input.decode("utf8").rstrip()
+    text = read_bytes(conn).decode("utf8").rstrip()
     print('receive '+text)
     return text
+
+def send_bytes(conn, bytes):
+    conn.sendall(bytes)
+
 
 def send_connection(conn, text):
     conn.sendall(text.encode("utf8"))
@@ -38,11 +48,11 @@ class user():
         self.nonce = 0
 
     def getNonce(self):
-        self.nonce =random.getrandbits(80)
+        self.nonce =str(random.getrandbits(80))
         return self.nonce
 
     def getHash(self):
-        return hash(str(self.password)+str(self.nonce))
+        return generateHash(self.password+self.nonce)
 
     def setNonce(self, nonce):
         self.nonce = nonce

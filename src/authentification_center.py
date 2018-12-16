@@ -7,19 +7,21 @@ users = []
 #-------------------------------------------
 
 def client_thread(conn, ip):
-    input_text = read_connection(conn)
-    username='ulrik'
+    username = read_connection(conn)
     for  x in users:
         if username == x.username:
+            #find which client ask to authentificate
             user = x
+            print(user.username+" ask for authentification "+ " pass "+user.password)
             break
 
-    send_connection(conn,user.getNonce())# send it to client
+    send_connection(conn,user.getNonce()) # send it to client the nonce as bytes
     hashReceive = read_connection(conn)
+
     if(user.check(hashReceive)) :
-        send_connection("accept")
+        send_connection(conn,"accept")
     else :
-        send_connection("not accept")
+        send_connection(conn,"not accept")
 
     conn.close()  # close connection
     print('Connection ' + str(ip) + ':' + str(portNumber)+ " ended")
@@ -65,7 +67,7 @@ def readUserFile():
     with open(filename) as f:
         lines= f.readlines()
     for line in lines:
-        values = line.split(" ")
+        values = line.replace('\n','').split(" ")
         users.append(user(values[0],values[1]))
 
 readUserFile()
