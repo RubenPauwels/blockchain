@@ -3,17 +3,22 @@ from src.lib import *
 import datetime
 from src.lib import send_connection
 from src.lib import read_connection
-
+import socket
+from src.lib import *
+from threading import Thread
 import src.lib
 import socket
 
 import array as arr
 import os.path
 
-NUMBER_NODE = input("What client do you want to be?\n") #read from terminal
+NUMBER_NODE_temp = input("What client do you want to be?\n") #read from terminal
+NUMBER_NODE=int(NUMBER_NODE_temp)
 
 
+#input 1-6#output IP-adress
 def readIp_node(nodeNumber):
+
         filename = "../config/host_node"+str(nodeNumber)
         if not os.path.isfile(filename):
             print("File does not exist")
@@ -25,6 +30,8 @@ def readIp_node(nodeNumber):
                 ip_address = ip_address[1]
 
         return ip_address
+
+#input 1-6#registration IP adress
 def readIp_reg(nodeNumber):
         filename = "../config/host_node"+str(nodeNumber)
         if not os.path.isfile(filename):
@@ -37,6 +44,8 @@ def readIp_reg(nodeNumber):
                 ip_address = ip_address[1]
 
         return ip_address
+
+ #input 1-6#list of ip numbers of neighbors
 def readIp_neighbors(nodeNumber):
         filename = "../config/host_node"+str(nodeNumber)
         if not os.path.isfile(filename):
@@ -49,7 +58,6 @@ def readIp_neighbors(nodeNumber):
                 #     print(i)
 
         return ip_address_neighbors
-    # print(readIp_neighbors(2)[0])
 
 # ----------------------------------------------------------------------------------
 
@@ -69,7 +77,7 @@ class block():
         self.hash = generateHash(i)
 
     def Hash_calculate(self, index, amount, timestamp, receiver, sender, prevHash):
-        i = str(index) + str(amount) + str(timestamp) + receiver + sender + prevHash
+        i = str(index) + str(amount) + timestamp + receiver + sender + prevHash
         ans = hash(i)
         return (ans)
 # ---------------------------------------------------------------------------------
@@ -108,10 +116,9 @@ class blockchain():
         if self.get_lastblock().hash==block_incomming.prevHash and (self.get_lastblock().index+1)==block_incomming.index :
             if block_incomming.regenerateHash(block_incomming.index,block_incomming.amount,block_incomming.timestamp,block_incomming.receiver,block_incomming.sender,block_incomming.prevHash)==block_incomming.hash:
                 return 1
-
-
         else:
-            return 0
+                return 0
+
     def controle_add(self,block_incomming):
         #controle if block may be added, if yes add
         if self.controle(block_incomming):
@@ -147,7 +154,8 @@ print(b.get_lastblock().receiver)
 
 
 if False:
-#def sendBlock():
+    def sendBlock():
+    s="rer"
     #client starts the conversesion
     #####################
     #from server to client
@@ -156,18 +164,36 @@ if False:
 
 
 
-#def askLastindex():
+def sendBlock():
     #asking last index to neighbours
     #for not sending the same block 2 times
+    list=readIp_neighbors(NUMBER_NODE)
+    for i in list:
+        Thread(target=askIndex_threat, args=(i)).start()
+
+def askIndex_threat(i):
+
+    #open socket
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    iPaddresssServer = "127.0.0.2"
+
+    #open the socket
+    iPaddresssServer=i
     soc.connect((iPaddresssServer, src.lib.portNumber))
-
-    clients_input = input("What you want to proceed my dear client?\n")  # read from terminal
-
+    #what to send
+    clients_input="a"
     send_connection(soc, clients_input)  # we must encode the string to bytes
 
+    #what received
     result_string = read_connection(soc)
+    content = result_string.split('/')
 
+    #get last 4 chars of current last block
+    tempp= b.get_lastblock().hash
+    last4ofhashblockchain=tempp[-4:]
 
-
+    if int(content[0])==b.get_lastblock().index and last4ofhashblockchain==content[1]:
+        #send block to server
+        test="sd"
+    else:
+        abortmission=#sqd#
+    soc.close();
