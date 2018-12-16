@@ -13,6 +13,7 @@ text="Hello World"
 hash_object = hashlib.sha256(b'Hello World')
 print(hashlib.sha256(text.encode()).hexdigest())
 print("hoi modefuckers")
+#dit is een comment
 
 print(text.encode())
 print(hashb(text))
