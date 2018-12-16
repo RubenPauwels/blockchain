@@ -20,4 +20,4 @@ print test.timestamp
 
 class blockchain():
     def __init__(self):
-        self
+        
