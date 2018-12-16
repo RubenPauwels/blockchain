@@ -48,35 +48,37 @@ def readIp_neighbors(nodeNumber):
 
 class block():
     # this is a block
-    def __init__(self ,index ,amount ,timestamp_nostri ,receiver ,sender ,PrevHash):
-
+    def __init__(self, index, amount, timestamp, receiver, sender, prevHash):
         self.index =index  # height of the block
         self.amount =amount  # amount of transaction
-        self.timestamp =timestamp_nostri  # time
+        self.timestamp =timestamp  # time (string)
         self.receiver =receiver
         self.sender =sender
-        self.PrevHash =PrevHash  # hash of the previous block
+        self.prevHash =prevHash  # hash of the previous block
         # we putt everything together
-        i=str(index)+str(amount)+str(timestamp_nostri)+receiver +sender+ PrevHash
-        self.Hash=hash(i)
-    def Hash_calculate(self ,index ,amount ,timestamp_nostri ,receiver ,sender ,PrevHash):
 
-        i = str(index) + str(amount) + str(timestamp_nostri) + receiver + sender + PrevHash
+        i=str(index) + str(amount) + timestamp + receiver + sender + prevHash
+
+        self.hash = generateHash(i)
+
+    def Hash_calculate(self, index, amount, timestamp, receiver, sender, prevHash):
+        i = str(index) + str(amount) + str(timestamp) + receiver + sender + prevHash
         ans = hash(i)
         return (ans)
 # ---------------------------------------------------------------------------------
 
 
 
-def blockToText():
-    block.index
-    text =str(block.index)
+def blockToText(block):
+    text =str(block.index)+'/'+str(block.amount)+'/'+str(block.timestamp)+'/'+str(block.receiver)+'/'+str(block.sender)\
+          +'/'+str(block.prevHash)+'/'+str(block.hash)
     return text
 
-    # def textToBlock():
-    #     block_fromText = block;
-    #     return block_fromText
-
+def textToBlock(text):
+    content = text.split('/')
+    print(content)
+    blockFromText = block(int(content[0]), int(content[1]), content[2], content[3], content[4], content[5])
+    return blockFromText
 
 
 # ----------------------
@@ -96,8 +98,8 @@ class blockchain():
         return (a)
     def controle(self,block_incomming):
         #function that gives back 0 or 1, to check if a block may be added to the blockchain
-        if self.get_lastblock().Hash==block_incomming.PrevHash and (self.get_lastblock().index+1)==block_incomming.index :
-            if block_incomming.Hash_calculate(block_incomming.index,block_incomming.amount,block_incomming.timestamp,block_incomming.receiver,block_incomming.sender,block_incomming.PrevHash)==block_incomming.Hash:
+        if self.get_lastblock().hash==block_incomming.prevHash and (self.get_lastblock().index+1)==block_incomming.index :
+            if block_incomming.regenerateHash(block_incomming.index,block_incomming.amount,block_incomming.timestamp,block_incomming.receiver,block_incomming.sender,block_incomming.prevHash)==block_incomming.hash:
                 return 1
 
 
@@ -114,13 +116,21 @@ class blockchain():
 
 
 
-
+#------- TESTBENCH --------
 b = blockchain()
-blok1 = block(1, 4, datetime.datetime.now(), "kakak", "sender", "zeze")
+dateTime = str(datetime.datetime.now())
+blok1 = block(1, 4, dateTime, "kakak", "sender", "previousHash")
+
+
+textFromBlock = blockToText(blok1)
+print(textFromBlock+"\n")
+blockRecoverd =textToBlock(textFromBlock)
+textRecoverd = blockToText(blockRecoverd)
+print(textRecoverd+"\n")
+
+
 b.__add__(blok1)
-blok2 = block(4, 4, datetime.datetime.now(), "Ruben", "sender", b.get_lastblock().Hash)
+blok2 = block(4, 4, dateTime, "Ruben", "sender", b.get_lastblock().hash)
 b.controle_add(blok2)
-
-
 
 print(b.get_lastblock().receiver)

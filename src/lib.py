@@ -3,7 +3,7 @@ import hashlib
 import sys
 
 #input  a string
-def hash(text):
+def generateHash(text):
      return hashlib.sha256(text.encode()).hexdigest()
 
 portNumber = 5001
