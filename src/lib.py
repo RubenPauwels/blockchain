@@ -27,3 +27,4 @@ def read_connection(conn):
 
 def send_connection(conn, text):
     conn.sendall(text.encode("utf8"))
+
