@@ -14,7 +14,7 @@ hash_object = hashlib.sha256(b'Hello World')
 print(hashlib.sha256(text.encode()).hexdigest())
 print("hoi modefuckers")
 #dit is een comment
-
+#dit is anders
 print(text.encode())
 print(hashb(text))
 
