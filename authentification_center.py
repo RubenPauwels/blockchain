@@ -32,7 +32,7 @@ def do_some_stuffs_with_input(input_string):
     print("Processing that nasty input!")
     return input_string[::-1]
 
-def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
+def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 10):
     input_from_client = read_from_client(conn, MAX_BUFFER_SIZE)
 
     #vysl = res.encode("utf8")  # encode the result string
@@ -49,7 +49,7 @@ def start_server():
     print('Socket created')
 
     try:
-        soc.bind(("127.0.0.1", lib.portNumbe))
+        soc.bind(("127.0.0.1", lib.portNumber))
         print('Socket bind complete')
     except socket.error as msg:
         import sys
