@@ -234,7 +234,7 @@ def askIndex_threat(i):
         # send block to server
         test = "sd"
     soc.close();
-
+#----------------------------serverside------------------------
 def Connection_as_server(conn, ip):
     input_text = read_connection(conn)
 
