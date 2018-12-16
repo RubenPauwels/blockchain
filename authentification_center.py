@@ -1,8 +1,21 @@
+import _thread
 import socket
 import uuid
 
-def thread_client(conn):
-    
+def client_thread(socket):
+    data = s.recv(1024)
+    if data:
+        message_queues[s].put(data)
+        if s not in outputs:
+            outputs.append(s)
+    else:
+        if s in outputs:
+            outputs.remove(s)
+        inputs.remove(s)
+        s.close()
+        del message_queues[s]
+
+
 
 
 #Homoooooo's
@@ -26,5 +39,5 @@ while 1:
     (clientsocket, address) = serversocket.accept()
     #now do something with the clientsocket
     #in this case, we'll pretend this is a threaded server
-    ct = client_thread(clientsocket)
-    ct.run()
+    _thread.start_new_thread(client_thread(clientsocket),())
+
