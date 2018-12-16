@@ -21,9 +21,11 @@ ff= b+c+str(d)
 print ff
 ts=4
 ts=datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+print
 
+if False:
 
+    blockk=block(2,4,23,"kakak","sender","zeze")
 
-a=block(2,4,23,"kakak","sender","zeze")
-print lib.hash("sqd")
-print a.Hash
+    print lib.hash("sqd")
+
