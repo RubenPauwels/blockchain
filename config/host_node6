@@ -1,6 +1,6 @@
 [node6]
 ip_address = 127.0.6.1
-username = "user 6"
+username = "user6"
 
 [registration]
 ip_address = 127.0.0.10

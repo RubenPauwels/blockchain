@@ -4,20 +4,6 @@ from src.lib import *
 
 users = []
 
-#-------------------------------------------------------
-class user():
-    def __init__(self,userName,password):
-        self.username=userName
-        self.password=password
-        self.nonce = 0
-
-    def getNonce(self):
-        self.nonce =random.getrandbits(80)
-        return self.nonce
-
-    def check(self, hash):
-        return hash == hash(str(self.password)+str(self.nonce))
-
 #-------------------------------------------
 
 def client_thread(conn, ip):
@@ -45,9 +31,8 @@ def start_server():
     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     print('Socket created on')
 
-    ipaddress = "127.0.0.2"
     try:
-        soc.bind((ipaddress, portNumber))
+        soc.bind((ipAuthentification, portNumber))
         print('Socket bind complete')
     except socket.error as msg:
         import sys
@@ -56,7 +41,7 @@ def start_server():
 
     #Start listening on socket
     soc.listen(10)
-    print('Socket now listening on '+str(ipaddress))
+    print('Socket now listening on '+str(ipAuthentification))
 
     # for handling task in separate jobs we need threading
     from threading import Thread
@@ -84,6 +69,6 @@ def readUserFile():
         users.append(user(values[0],values[1]))
 
 readUserFile()
-
+start_server()
 print('nonce '+str(users[0].getNonce()))
 print('user '+str(users[0].username)+' pasword '+str(users[0].password)+' nonce '+str(users[0].nonce))

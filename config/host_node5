@@ -1,6 +1,6 @@
 [node5]
 ip_address = 127.0.5.1
-username = "user 5"
+username = "user5"
 
 [registration]
 ip_address = 127.0.0.10

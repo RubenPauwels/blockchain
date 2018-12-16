@@ -1,6 +1,7 @@
 #lib for functions used by nodes and aut center
 import hashlib
 import sys
+import random
 
 #input  a string
 def hash(text):
@@ -8,6 +9,7 @@ def hash(text):
 
 portNumber = 5001
 MAX_BUFFER_SIZE=4096
+ipAuthentification = "127.0.0.10"
 
 #return the input of socket as text
 def read_connection(conn):
@@ -28,3 +30,23 @@ def read_connection(conn):
 def send_connection(conn, text):
     conn.sendall(text.encode("utf8"))
 
+#-------------------------------------------------------
+class user():
+    def __init__(self,userName,password):
+        self.username=userName
+        self.password=password
+        self.nonce = 0
+
+    def getNonce(self):
+        self.nonce =random.getrandbits(80)
+        return self.nonce
+
+    def getHash(self):
+        return hash(str(self.password)+str(self.nonce))
+
+    def setNonce(self, nonce):
+        self.nonce = nonce
+        return self.getHash()
+
+    def check(self, hash):
+        return hash == self.getHash()
