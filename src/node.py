@@ -1,9 +1,16 @@
 
 from src.lib import *
 import datetime
+from src.lib import send_connection
+from src.lib import read_connection
+
+import src.lib
+import socket
 
 import array as arr
 import os.path
+
+NUMBER_NODE = input("What client do you want to be?\n") #read from terminal
 
 
 def readIp_node(nodeNumber):
@@ -113,7 +120,8 @@ class blockchain():
 
 
 
-
+#how to get the time
+#datetime.datetime.now()
 
 b = blockchain()
 blok1 = block(1, 4, datetime.datetime.now(), "kakak", "sender", "zeze")
@@ -124,3 +132,30 @@ b.controle_add(blok2)
 
 
 print(b.get_lastblock().receiver)
+
+
+if False:
+#def sendBlock():
+    #client starts the conversesion
+    #####################
+    #from server to client
+    #send to all neighbours
+    #from clint to server
+
+
+
+#def askLastindex():
+    #asking last index to neighbours
+    #for not sending the same block 2 times
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    iPaddresssServer = "127.0.0.2"
+    soc.connect((iPaddresssServer, src.lib.portNumber))
+
+    clients_input = input("What you want to proceed my dear client?\n")  # read from terminal
+
+    send_connection(soc, clients_input)  # we must encode the string to bytes
+
+    result_string = read_connection(soc)
+
+
+
