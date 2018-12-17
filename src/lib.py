@@ -130,13 +130,13 @@ class block():
         return (ans)
 
     def print(self):
-        print(" index "+str(self.index))
-        print(" amount "+str(self.amount))
-        print(" timestamp "+self.timestamp)
-        print(" sender "+self.sender)
-        print(" receiver "+self.receiver)
-        print(" prevHash "+self.prevHash)
-        print(" hash "+self.hash)
+        print("--  index "+str(self.index))
+        print("--  amount "+str(self.amount))
+        print("--  timestamp "+self.timestamp)
+        print("--  sender "+self.sender)
+        print("--  receiver "+self.receiver)
+        print("--  prevHash "+self.prevHash)
+        print("--  hash "+self.hash)
 
 
 class blockchain():
@@ -182,10 +182,17 @@ class blockchain():
         self.__add__(newblock)
         return newblock
     def print(self):
+        print("------------------------------------------------------------------------------")
+        print("-------------------------Blockchain-------------------------------------------")
+        print("------------------------------------------------------------------------------")
         for i in range(len(self.Blockchain_arr)):
-            print("block "+str(i))
+            print("--------------------block "+str(i)+"---------------------------------------")
             self.Blockchain_arr[i].print()
-#-------------------------USer------------------------------
+        print("------------------------------------------------------------------------------")
+        print("-------------------------end of Blockchain------------------------------------")
+        print("------------------------------------------------------------------------------")
+
+#------------------------------------------------------USer--------------------------------------------------------------------
 class user():
     def __init__(self,userName,password):
         self.username=userName
