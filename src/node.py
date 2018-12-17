@@ -210,7 +210,7 @@ def sendBlock():
 def askIndex_threat(i):
 
     #open socket
-    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)# AF_INET = Ip4, STREAM = TCP
 
     #open the socket
     iPaddresssServer=i
