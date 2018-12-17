@@ -32,11 +32,12 @@ def read_bytes(conn):
 def read_connection(conn):
     # decode input and strip the end of line
     text = read_bytes(conn).decode("utf8").rstrip()
-    print('receive '+text)
+    print('receive: '+text)
     return text
 def send_bytes(conn, bytes):
     conn.sendall(bytes)
 def send_connection(conn, text):
+    print('send: '+text)
     conn.sendall(text.encode("utf8"))
 
 #-------------------------Textfile readers------------------------------
@@ -109,7 +110,6 @@ class block():
     # this is a block
     def __init__(self, index, amount, timestamp, receiver, sender, prevHash):
         self.index =index  # height of the block
-        print('indexb '+str(self.index))
         self.amount =amount  # amount of transaction
         self.timestamp =timestamp  # time (string)
         self.receiver =receiver
@@ -124,13 +124,14 @@ class block():
 
     def Hash_calculate(self, index, amount, timestamp, receiver, sender, prevHash):
         i = str(index) + str(amount) + timestamp + receiver + sender + prevHash
-        ans = hash(i)
+        ans = generateHash(i)
         return (ans)
 
     def print(self):
         print(" index "+str(self.index))
         print(" amount "+str(self.amount))
         print(" timestamp "+self.timestamp)
+        print(" sender "+self.sender)
         print(" receiver "+self.receiver)
         print(" prevHash "+self.prevHash)
         print(" hash "+self.hash)
@@ -155,7 +156,7 @@ class blockchain():
         # function that gives back 0 or 1, to check if a block may be added to the blockchain
         if self.get_lastblock().hash == block_incomming.prevHash and (
                 self.get_lastblock().index + 1) == block_incomming.index:
-            if block_incomming.regenerateHash(block_incomming.index, block_incomming.amount, block_incomming.timestamp,
+            if block_incomming.Hash_calculate(block_incomming.index, block_incomming.amount, block_incomming.timestamp,
                                               block_incomming.receiver, block_incomming.sender,
                                               block_incomming.prevHash) == block_incomming.hash:
                 return 1
@@ -175,7 +176,7 @@ class blockchain():
     def newTransaction(self, to, amount):
         lastBlock = self.get_lastblock()
         dateTime = str(datetime.datetime.now())
-        newblock = block(lastBlock.index + 1, amount, dateTime, 'me', 'to', lastBlock.hash)
+        newblock = block(lastBlock.index + 1, amount, dateTime, 'me', to, lastBlock.hash)
         self.__add__(newblock)
         return newblock
     def print(self):
@@ -210,3 +211,4 @@ class conversation(Enum):
     upToDate = "b"
     accepted = "c"
     notAccepted = "d"
+    showBlockchain = "e"

@@ -46,8 +46,10 @@ def sendBlocksEoAll():
     string = "127.0.1.1"
     sendBlock(string)
     #Thread(target=sendBlock, args=(string)).start()
-    #for i in range(len(list)):
-        #print(list[i])
+    for i in range(len(list)):
+        print(list[i])
+        if list[i]==string:
+            print('match: '+i)
         #Thread(target=sendBlock, args=str(list[i])).start()
 
 def sendBlock(string):
@@ -67,6 +69,7 @@ def sendBlock(string):
     else:
         tosend = blockToText(b.get_lastblock()) #sending the last block of the chain as text
     send_connection(soc,tosend)
+
     answer = read_connection(soc)
     print("answer "+answer)
     soc.close();
@@ -76,9 +79,10 @@ def receiveBlock(conn):
     tempp = b.get_lastblock().hash
     last4ofhashblockchain = tempp[-4:]
     toSend = str(b.get_lastblock().index) +'/'+ last4ofhashblockchain
+
     send_connection(conn,toSend)
 
-    receive = receiveBlock(conn)
+    receive = read_connection(conn)
     if receive == conversation.upToDate._value_:
         return
     else:
@@ -141,18 +145,21 @@ def start_server():
 
 
 def main():
-    print('length '+str(b.get_lastblock()))
     if not authentification():
         print('not authentificate')
         return
     Thread(target=start_server).start()
     print('ja')
     while(True):
-        money = input('how much do you want to give\n')
-        who = input('to who\n')
-        block = b.newTransaction(who,money)
-        #b.print()
-        sendBlocksEoAll()
+        inputText = input("to sho blockshain press'" + conversation.showBlockchain._value_+"', to make a transaction press everithing else'\n")
+        if inputText ==conversation.showBlockchain._value_:
+            b.print()
+        else:
+            amount = int(input('how much do you want to give\n'))
+            who = input('to who\n')
+            block = b.newTransaction(who,amount)
+            #b.print()
+            sendBlocksEoAll()
 
 
 
@@ -179,6 +186,5 @@ def main():
 #blok1 = block(1, 4, "123", "kakak", "sender", "previousHash")
 
 
-#print('index '+str(blok1.index))
-print(conversation.accepted._value_)
+
 main()
