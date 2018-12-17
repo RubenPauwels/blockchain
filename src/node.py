@@ -139,6 +139,7 @@ def textToBlock(text):
 class blockchain():
     def __init__(self):
         self.Blockchain_arr = []
+        
 
     def __add__(self, block_add):
         #add the given block to the blockchain
@@ -160,43 +161,14 @@ class blockchain():
         #controle if block may be added, if yes add
         if self.controle(block_incomming):
             self.__add__(block_incomming)
+            return 1
         else:
             index=b.get_lastblock().index
             print("blok not added, should be blok"+str(index+1))
+            return 0
 
 
 
-#how to get the time
-#datetime.datetime.now()
-
-
-#------- TESTBENCH --------
-b = blockchain()
-dateTime = str(datetime.datetime.now())
-blok1 = block(1, 4, dateTime, "kakak", "sender", "previousHash")
-
-
-textFromBlock = blockToText(blok1)
-print(textFromBlock+"\n")
-blockRecoverd =textToBlock(textFromBlock)
-textRecoverd = blockToText(blockRecoverd)
-print(textRecoverd+"\n")
-
-
-b.__add__(blok1)
-blok2 = block(4, 4, dateTime, "Ruben", "sender", b.get_lastblock().hash)
-b.controle_add(blok2)
-
-print(b.get_lastblock().receiver)
-authentification()
-
-if False:
-    s="rer"
-    #client starts the conversesion
-    #####################
-    #from server to client
-    #send to all neighbours
-    #from clint to server
 
 def start_conversation_client(i,conversationEnum):
     # open socket
@@ -213,7 +185,7 @@ def sendBlocksEoAll():
     #for not sending the same block 2 times
     list=readIp_neighbors(NUMBER_NODE)
     for i in list:
-        Thread(target=askIndex_threat, args=(i)).start()
+        Thread(target=sendBlock, args=(i)).start()
 
 def sendBlock(i):
     soc =start_conversation_client(i,conversation.sendBLock)
@@ -227,10 +199,11 @@ def sendBlock(i):
     last4ofhashblockchain=tempp[-4:]
 
     if int(content[0])==b.get_lastblock().index and last4ofhashblockchain==content[1]:
+        tosend = conversation.ipToDate
         soc.close()
     else:
         tosend = blockToText(b.get_lastblock()) #sending the last block of the chain as text
-        send_connection(soc,tosend)
+    send_connection(soc,tosend)
 
     soc.close();
 #----------------------------serverside------------------------
@@ -240,6 +213,20 @@ def receiveBlock(conn):
     last4ofhashblockchain = tempp[-4:]
     toSend = str(b.get_lastblock().index) +'/'+ last4ofhashblockchain
     send_connection(conn,toSend)
+
+    receive = receiveBlock(conn)
+    if receive == conversation.upToDate:
+        return
+    else:
+        blockIncoming = textToBlock(receive)
+        if b.controle(blockIncoming):
+            send=conversation.accepted
+        else:
+            send=conversation.notAccepted
+        send_connection(conn,send)
+
+
+
     #....
 
 def Connection_as_server(conn, ip):
@@ -287,3 +274,33 @@ def start_server():
             import traceback
             traceback.print_exc()
     soc.close()
+
+#-----------------main---------------------------
+def main():
+    if not authentification():
+        print('not authentificate')
+        return
+
+
+
+#------- TESTBENCH --------
+b = blockchain()
+dateTime = str(datetime.datetime.now())
+blok1 = block(1, 4, dateTime, "kakak", "sender", "previousHash")
+
+
+textFromBlock = blockToText(blok1)
+print(textFromBlock+"\n")
+blockRecoverd =textToBlock(textFromBlock)
+textRecoverd = blockToText(blockRecoverd)
+print(textRecoverd+"\n")
+
+
+b.__add__(blok1)
+blok2 = block(4, 4, dateTime, "Ruben", "sender", b.get_lastblock().hash)
+b.controle_add(blok2)
+
+print(b.get_lastblock().receiver)
+authentification()
+
+

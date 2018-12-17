@@ -33,6 +33,7 @@ def client_thread(conn, ip):
 
 def start_server():
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     # this is for easy starting/killing the app
     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     print('Socket created on')
