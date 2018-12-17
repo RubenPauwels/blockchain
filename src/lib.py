@@ -76,9 +76,11 @@ def readIp_neighbors(nodeNumber):
         else:
             with open(filename) as f:
                 content = f.readlines()
-                ip_address_neighbors = content[9 :]
-                # for i in ip_address_neighbors:
-                #     print(i)
+                list = content[9 :]
+                ip_address_neighbors=[]
+                for i in range(len(list)):
+                    ip_address_neighbors.append(list[i].translate({ord(c): None for c in ' \n"'}))
+                    #print(i)
 
         return ip_address_neighbors
 

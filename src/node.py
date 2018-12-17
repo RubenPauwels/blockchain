@@ -44,13 +44,13 @@ def sendBlocksEoAll():
     #for not sending the same block 2 times
     list=readIp_neighbors(NUMBER_NODE)
     string = "127.0.1.1"
-    sendBlock(string)
+    #sendBlock(string)
     #Thread(target=sendBlock, args=(string)).start()
     for i in range(len(list)):
         print(list[i])
         if list[i]==string:
-            print('match: '+i)
-        #Thread(target=sendBlock, args=str(list[i])).start()
+            print('match: '+str(i))
+        Thread(target=sendBlock, args=[list[i]]).start()
 
 def sendBlock(string):
     print(string)
@@ -157,33 +157,10 @@ def main():
         else:
             amount = int(input('how much do you want to give\n'))
             who = input('to who\n')
-            block = b.newTransaction(who,amount)
-            #b.print()
+            b.newTransaction(who,amount)
             sendBlocksEoAll()
 
 
-
-
-#------- TESTBENCH --------
-# b = blockchain()
-# dateTime = str(datetime.datetime.now())
-# blok1 = block(1, 4, dateTime, "kakak", "sender", "previousHash")
-#
-#
-# textFromBlock = blockToText(blok1)
-# print(textFromBlock+"\n")
-# blockRecoverd =textToBlock(textFromBlock)
-# textRecoverd = blockToText(blockRecoverd)
-# print(textRecoverd+"\n")
-#
-#
-# b.__add__(blok1)
-# blok2 = block(4, 4, dateTime, "Ruben", "sender", b.get_lastblock().hash)
-# b.controle_add(blok2)
-#
-# print(b.get_lastblock().receiver)
-# authentification()
-#blok1 = block(1, 4, "123", "kakak", "sender", "previousHash")
 
 
 
