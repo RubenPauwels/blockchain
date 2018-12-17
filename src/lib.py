@@ -29,15 +29,15 @@ def read_bytes(conn):
     return input
 
 #return the input of socket as text
-def read_connection(conn):
+def read_connection(conn,ipSource="unknow"):
     # decode input and strip the end of line
     text = read_bytes(conn).decode("utf8").rstrip()
-    print('receive: '+text)
+    print('['+ipSource+'] receive: '+text)
     return text
 def send_bytes(conn, bytes):
     conn.sendall(bytes)
-def send_connection(conn, text):
-    print('send: '+text)
+def send_connection(conn, text,ipSource="unknow"):
+    print('[' + ipSource + '] send: ' + text)
     conn.sendall(text.encode("utf8"))
 
 #-------------------------Textfile readers------------------------------
@@ -52,7 +52,7 @@ def readIp_node(nodeNumber):
                 content = f.readlines()
 
                 ip_address = content[1].split('= ')
-                ip_address = ip_address[1]
+                ip_address = ip_address[1].translate({ord(c): None for c in ' \n"'})
 
         return ip_address
 #input 1-6#registration IP adress

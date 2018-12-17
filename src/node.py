@@ -12,15 +12,14 @@ NUMBER_NODE=int(NUMBER_NODE_temp)
 def authentification():
 
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
     soc.connect((ipAuthentification, portNumber))
     thisUser = readUser(NUMBER_NODE)
+    ipSource="authentification center"
+    send_connection(soc,thisUser.username,ipSource)  #send username to auth center
+    nonce = read_connection(soc,ipSource)    #receive nonce
+    send_connection(soc,thisUser.setNonce(nonce),ipSource)   #send back hash
 
-    send_connection(soc,thisUser.username)  #send username to auth center
-    nonce = read_connection(soc)    #receive nonce
-    send_connection(soc,thisUser.setNonce(nonce))   #send back hash
-
-    answer = read_connection(soc)
+    answer = read_connection(soc,ipSource)
     print(answer)
 
     soc.close();
@@ -29,41 +28,39 @@ def authentification():
 
 b = blockchain()
 
-def start_conversation_client(i, conversationEnumValue):
+def start_conversation_client(ip, conversationEnumValue,ipSource):
     # open socket
-    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # AF_INET = Ip4, STREAM = TCP
 
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # AF_INET = Ip4, STREAM = TCP
+    soc.bind((ipSource,0))
     # open the socket
-    iPaddresssServer = i
+    iPaddresssServer = ip
     soc.connect((iPaddresssServer, portNumber))#ip4 and tcp
-    send_connection(soc, conversationEnumValue)#send kind of conversation
+    send_connection(soc, conversationEnumValue,ipSource)#send kind of conversation
     return soc
 
-def sendBlocksEoAll(ip = 'optional'):
+def sendBlocksEoAll(ipSource, ip='optional'):
     #ip => ask not to this ip address
     #asking last index to neighbours
     #for not sending the same block 2 times
     list=readIp_neighbors(NUMBER_NODE)
-
     for i in range(len(list)):
-        print(ip)
         if list[i]!=ip:
-            Thread(target=sendBlock, args=[list[i]]).start()
-        else:
-            print('send not to '+ip)
+            Thread(target=sendBlock, args=[ipSource,list[i]]).start()
 
-def sendBlock(ip):
-    print(ip)
+
+def sendBlock(ipSource, ipDestination):
     try:
-        soc =start_conversation_client(ip, conversation.sendBLock._value_)
-    except:
-        print("Terible error! could not connect with: "+ip)
-        return
+        soc =start_conversation_client(ipDestination, conversation.sendBLock._value_,ipSource)
+    except ConnectionRefusedError:
+        print("Terible error! could not connect with: " + ipDestination)
         #import traceback
         #traceback.print_exc()
+        return
+
 
     #what received
-    result_string = read_connection(soc)
+    result_string = read_connection(soc, ipDestination)
     content = result_string.split('/')
 
     #get last 4 chars of current last block
@@ -74,9 +71,9 @@ def sendBlock(ip):
         tosend = conversation.ipToDate._value_
     else:
         tosend = blockToText(b.get_lastblock()) #sending the last block of the chain as text
-    send_connection(soc,tosend)
+    send_connection(soc, tosend, ipDestination)
 
-    answer = read_connection(soc)
+    answer = read_connection(soc, ipDestination)
     soc.close();
 #----------------------------serverside------------------------
 def receiveBlock(conn,ip):
@@ -85,35 +82,34 @@ def receiveBlock(conn,ip):
     last4ofhashblockchain = tempp[-4:]
     toSend = str(b.get_lastblock().index) +'/'+ last4ofhashblockchain
 
-    send_connection(conn,toSend)
+    send_connection(conn,toSend,ip)
 
-    receive = read_connection(conn)
+    receive = read_connection(conn,ip)
     if receive == conversation.upToDate._value_:
         return
     else:
         blockIncoming = textToBlock(receive)
         if b.controle_add(blockIncoming):
             send=conversation.accepted._value_
-            sendBlocksEoAll(ip)
+            ipSource = readIp_node(NUMBER_NODE)
+            send_connection(conn, send, ip)
+            sendBlocksEoAll(ipSource, ip)
 
         else:
             send=conversation.notAccepted._value_
-        send_connection(conn,send)
+            send_connection(conn,send,ip)
 
 
-
-    #....
-
-def Connection_as_server(conn, ip):
-    identification_code = read_connection(conn)#read first message with tag to know subject of conversation
+def Connection_as_server(conn, ipSource):
+    identification_code = read_connection(conn,ipSource)#read first message with tag to know subject of conversation
 
     if identification_code==conversation.sendBLock._value_:
         #get a request for updating of blockchain
-        receiveBlock(conn,ip)
+        receiveBlock(conn,ipSource)
 
 
     conn.close()  # close connection
-    print('Connection ' + str(ip) + ':' + str(portNumber)+ " ended")
+    print('Connection ' + str(ipSource) + ':' + str(portNumber)+ " ended")
 
 
 def start_server():
@@ -158,7 +154,7 @@ def main():
         print('not authentificate')
         return
     Thread(target=start_server).start()
-    print('ja')
+    ipSource = readIp_node(NUMBER_NODE)
     while(True):
         inputText = input("to sho blockshain press'" + conversation.showBlockchain._value_+"', to make a transaction press everithing else'\n")
         if inputText ==conversation.showBlockchain._value_:
@@ -167,7 +163,7 @@ def main():
             amount = int(input('how much do you want to give\n'))
             who = input('to who\n')
             b.newTransaction(who,amount)
-            sendBlocksEoAll()
+            sendBlocksEoAll(ipSource)
 
 
 
