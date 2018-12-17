@@ -30,13 +30,13 @@ b = blockchain()
 
 def start_conversation_client(ip, conversationEnumValue,ipSource):
     # open socket
-
+    print('start soc with '+ip+':'+str(portNumber))
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # AF_INET = Ip4, STREAM = TCP
     soc.bind((ipSource,0))
     # open the socket
     iPaddresssServer = ip
     soc.connect((iPaddresssServer, portNumber))#ip4 and tcp
-    send_connection(soc, conversationEnumValue,ipSource)#send kind of conversation
+    send_connection(soc, conversationEnumValue,ip)#send kind of conversation
     return soc
 
 def sendBlocksEoAll(ipSource, ip='optional'):
