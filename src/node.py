@@ -198,26 +198,25 @@ if False:
     #send to all neighbours
     #from clint to server
 
+def start_conversation_client(i,conversationEnum):
+    # open socket
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # AF_INET = Ip4, STREAM = TCP
 
+    # open the socket
+    iPaddresssServer = i
+    soc.connect((iPaddresssServer, src.lib.portNumber))#ip4 and tcp
+    send_connection(soc, conversationEnum)#send kind of conversation
+    return soc
 
-def sendBlock():
+def sendBlocksEoAll():
     #asking last index to neighbours
     #for not sending the same block 2 times
     list=readIp_neighbors(NUMBER_NODE)
     for i in list:
         Thread(target=askIndex_threat, args=(i)).start()
 
-def askIndex_threat(i):
-
-    #open socket
-    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)# AF_INET = Ip4, STREAM = TCP
-
-    #open the socket
-    iPaddresssServer=i
-    soc.connect((iPaddresssServer, src.lib.portNumber))
-    #what to send
-    clients_input="a"
-    send_connection(soc, clients_input)  #send the input via the socket
+def sendBlock(i):
+    soc =start_conversation_client(i,conversation.sendBLock)
 
     #what received
     result_string = read_connection(soc)
@@ -228,17 +227,27 @@ def askIndex_threat(i):
     last4ofhashblockchain=tempp[-4:]
 
     if int(content[0])==b.get_lastblock().index and last4ofhashblockchain==content[1]:
-        vfvd='h'
-        #abortmission =  # sqd#
+        soc.close()
     else:
-        # send block to server
-        test = "sd"
+        tosend = blockToText(b.get_lastblock()) #sending the last block of the chain as text
+        send_connection(soc,tosend)
+
     soc.close();
 #----------------------------serverside------------------------
-def Connection_as_server(conn, ip):
-    input_text = read_connection(conn)
+def receiveBlock(conn):
+    # get last 4 chars of current last block
+    tempp = b.get_lastblock().hash
+    last4ofhashblockchain = tempp[-4:]
+    toSend = str(b.get_lastblock().index) +'/'+ last4ofhashblockchain
+    send_connection(conn,toSend)
+    #....
 
-    send_connection(conn,"send back same from server:"+input_text)# send it to client
+def Connection_as_server(conn, ip):
+    identification_code = read_connection(conn)
+    if identification_code==conversation.sendBLock:
+        receiveBlock(conn)
+
+
     conn.close()  # close connection
     print('Connection ' + str(ip) + ':' + str(portNumber)+ " ended")
 

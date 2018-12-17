@@ -3,6 +3,8 @@ import hashlib
 import sys
 import random
 
+
+
 #input  a string
 def generateHash(text):
      return hashlib.sha256(text.encode()).hexdigest()
@@ -40,7 +42,7 @@ def send_bytes(conn, bytes):
 def send_connection(conn, text):
     conn.sendall(text.encode("utf8"))
 
-#-------------------------------------------------------
+#-------------------------USer------------------------------
 class user():
     def __init__(self,userName,password):
         self.username=userName
@@ -60,3 +62,8 @@ class user():
 
     def check(self, hash):
         return hash == self.getHash()
+
+#-------------------------identifiers for conversations---------------------------------------------
+from enum import Enum
+class conversation(Enum):
+    sendBLock='a'
