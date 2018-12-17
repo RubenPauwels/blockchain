@@ -39,13 +39,18 @@ def start_conversation_client(i, conversationEnumValue):
     send_connection(soc, conversationEnumValue)#send kind of conversation
     return soc
 
-def sendBlocksEoAll():
+def sendBlocksEoAll(ip = 'optional'):
+    #ip => ask not to this ip address
     #asking last index to neighbours
     #for not sending the same block 2 times
     list=readIp_neighbors(NUMBER_NODE)
 
     for i in range(len(list)):
-        Thread(target=sendBlock, args=[list[i]]).start()
+        print(ip)
+        if list[i]!=ip:
+            Thread(target=sendBlock, args=[list[i]]).start()
+        else:
+            print('send not to '+ip)
 
 def sendBlock(ip):
     print(ip)
@@ -74,7 +79,7 @@ def sendBlock(ip):
     answer = read_connection(soc)
     soc.close();
 #----------------------------serverside------------------------
-def receiveBlock(conn):
+def receiveBlock(conn,ip):
     # get last 4 chars of current last block
     tempp = b.get_lastblock().hash
     last4ofhashblockchain = tempp[-4:]
@@ -89,6 +94,8 @@ def receiveBlock(conn):
         blockIncoming = textToBlock(receive)
         if b.controle_add(blockIncoming):
             send=conversation.accepted._value_
+            sendBlocksEoAll(ip)
+
         else:
             send=conversation.notAccepted._value_
         send_connection(conn,send)
@@ -98,9 +105,11 @@ def receiveBlock(conn):
     #....
 
 def Connection_as_server(conn, ip):
-    identification_code = read_connection(conn)
+    identification_code = read_connection(conn)#read first message with tag to know subject of conversation
+
     if identification_code==conversation.sendBLock._value_:
-        receiveBlock(conn)
+        #get a request for updating of blockchain
+        receiveBlock(conn,ip)
 
 
     conn.close()  # close connection

@@ -215,6 +215,7 @@ class user():
 
 #-------------------------identifiers for conversations---------------------------------------------
 from enum import Enum
+
 class conversation(Enum):
     sendBLock="send block"
     upToDate = "up to date"
