@@ -43,18 +43,19 @@ def sendBlocksEoAll():
     #asking last index to neighbours
     #for not sending the same block 2 times
     list=readIp_neighbors(NUMBER_NODE)
-    string = "127.0.1.1"
-    #sendBlock(string)
-    #Thread(target=sendBlock, args=(string)).start()
+
     for i in range(len(list)):
-        print(list[i])
-        if list[i]==string:
-            print('match: '+str(i))
         Thread(target=sendBlock, args=[list[i]]).start()
 
-def sendBlock(string):
-    print(string)
-    soc =start_conversation_client(string, conversation.sendBLock._value_)
+def sendBlock(ip):
+    print(ip)
+    try:
+        soc =start_conversation_client(ip, conversation.sendBLock._value_)
+    except:
+        print("Terible error! could not connect with: "+ip)
+        return
+        #import traceback
+        #traceback.print_exc()
 
     #what received
     result_string = read_connection(soc)
@@ -71,7 +72,6 @@ def sendBlock(string):
     send_connection(soc,tosend)
 
     answer = read_connection(soc)
-    print("answer "+answer)
     soc.close();
 #----------------------------serverside------------------------
 def receiveBlock(conn):

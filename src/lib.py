@@ -209,8 +209,8 @@ class user():
 #-------------------------identifiers for conversations---------------------------------------------
 from enum import Enum
 class conversation(Enum):
-    sendBLock="a"
-    upToDate = "b"
-    accepted = "c"
-    notAccepted = "d"
+    sendBLock="send block"
+    upToDate = "up to date"
+    accepted = "accepted"
+    notAccepted = "no accepted"
     showBlockchain = "e"
