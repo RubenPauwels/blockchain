@@ -29,14 +29,14 @@ def authentification():
 
 b = blockchain()
 
-def start_conversation_client(i,conversationEnum):
+def start_conversation_client(i, conversationEnumValue):
     # open socket
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # AF_INET = Ip4, STREAM = TCP
 
     # open the socket
     iPaddresssServer = i
     soc.connect((iPaddresssServer, portNumber))#ip4 and tcp
-    send_connection(soc, conversationEnum)#send kind of conversation
+    send_connection(soc, conversationEnumValue)#send kind of conversation
     return soc
 
 def sendBlocksEoAll():
@@ -46,13 +46,13 @@ def sendBlocksEoAll():
     string = "127.0.1.1"
     sendBlock(string)
     #Thread(target=sendBlock, args=(string)).start()
-    for i in range(len(list)):
-        print(list[i])
+    #for i in range(len(list)):
+        #print(list[i])
         #Thread(target=sendBlock, args=str(list[i])).start()
 
 def sendBlock(string):
     print(string)
-    soc =start_conversation_client(string, conversation.sendBLock)
+    soc =start_conversation_client(string, conversation.sendBLock._value_)
 
     #what received
     result_string = read_connection(soc)
@@ -63,12 +63,12 @@ def sendBlock(string):
     last4ofhashblockchain=tempp[-4:]
 
     if int(content[0])==b.get_lastblock().index and last4ofhashblockchain==content[1]:
-        tosend = conversation.ipToDate
-        soc.close()
+        tosend = conversation.ipToDate._value_
     else:
         tosend = blockToText(b.get_lastblock()) #sending the last block of the chain as text
     send_connection(soc,tosend)
-
+    answer = read_connection(soc)
+    print("answer "+answer)
     soc.close();
 #----------------------------serverside------------------------
 def receiveBlock(conn):
@@ -79,14 +79,14 @@ def receiveBlock(conn):
     send_connection(conn,toSend)
 
     receive = receiveBlock(conn)
-    if receive == conversation.upToDate:
+    if receive == conversation.upToDate._value_:
         return
     else:
         blockIncoming = textToBlock(receive)
         if b.controle_add(blockIncoming):
-            send=conversation.accepted
+            send=conversation.accepted._value_
         else:
-            send=conversation.notAccepted
+            send=conversation.notAccepted._value_
         send_connection(conn,send)
 
 
@@ -95,7 +95,7 @@ def receiveBlock(conn):
 
 def Connection_as_server(conn, ip):
     identification_code = read_connection(conn)
-    if identification_code==conversation.sendBLock:
+    if identification_code==conversation.sendBLock._value_:
         receiveBlock(conn)
 
 
@@ -151,7 +151,7 @@ def main():
         money = input('how much do you want to give\n')
         who = input('to who\n')
         block = b.newTransaction(who,money)
-        b.print()
+        #b.print()
         sendBlocksEoAll()
 
 
