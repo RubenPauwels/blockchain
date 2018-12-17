@@ -9,6 +9,9 @@ from threading import Thread
 import src.lib
 import socket
 
+# for handling task in separate jobs we need threading
+from threading import Thread
+
 import array as arr
 import os.path
 
@@ -102,6 +105,7 @@ class block():
     # this is a block
     def __init__(self, index, amount, timestamp, receiver, sender, prevHash):
         self.index =index  # height of the block
+        print('indexb '+str(self.index))
         self.amount =amount  # amount of transaction
         self.timestamp =timestamp  # time (string)
         self.receiver =receiver
@@ -112,6 +116,7 @@ class block():
         i=str(index) + str(amount) + timestamp + receiver + sender + prevHash
 
         self.hash = generateHash(i)
+
 
     def Hash_calculate(self, index, amount, timestamp, receiver, sender, prevHash):
         i = str(index) + str(amount) + timestamp + receiver + sender + prevHash
@@ -139,7 +144,8 @@ def textToBlock(text):
 class blockchain():
     def __init__(self):
         self.Blockchain_arr = []
-        
+        genesisBlock = block(0, 0, '0', 'I', 'you', 'genesis')
+        self.Blockchain_arr.append(genesisBlock)
 
     def __add__(self, block_add):
         #add the given block to the blockchain
@@ -147,8 +153,9 @@ class blockchain():
 
     def get_lastblock(self):
         #return a copy of the last block opbject
-        a=self.Blockchain_arr[self.Blockchain_arr.__len__()-1]
-        return (a)
+        a=self.Blockchain_arr[-1]
+        return a
+
     def controle(self,block_incomming):
         #function that gives back 0 or 1, to check if a block may be added to the blockchain
         if self.get_lastblock().hash==block_incomming.prevHash and (self.get_lastblock().index+1)==block_incomming.index :
@@ -167,8 +174,14 @@ class blockchain():
             print("blok not added, should be blok"+str(index+1))
             return 0
 
+    def newTransaction(self,to,amount):
+        lastBlock = self.get_lastblock()
+        dateTime = str(datetime.datetime.now())
+        newblock = block(lastBlock.index+1 ,amount,dateTime, 'me','to',lastBlock.hash)
+        self.__add__(newblock)
+        return newblock
 
-
+b = blockchain()
 
 def start_conversation_client(i,conversationEnum):
     # open socket
@@ -219,7 +232,7 @@ def receiveBlock(conn):
         return
     else:
         blockIncoming = textToBlock(receive)
-        if b.controle(blockIncoming):
+        if b.controle_add(blockIncoming):
             send=conversation.accepted
         else:
             send=conversation.notAccepted
@@ -258,8 +271,6 @@ def start_server():
     soc.listen(10)
     print('Socket now listening on '+str(ipaddress))
 
-    # for handling task in separate jobs we need threading
-    from threading import Thread
 
     # this will make an infinite loop needed for
     # not reseting server for every client
@@ -276,31 +287,45 @@ def start_server():
     soc.close()
 
 #-----------------main---------------------------
+
+
 def main():
+    print('length '+str(b.get_lastblock()))
     if not authentification():
         print('not authentificate')
         return
+    Thread(target=start_server).start()
+    print('ja')
+    while(True):
+        money = input('how much do you want to give\n')
+        who = input('to who\n')
+        block = b.newTransaction(who,money)
+        sendBlocksEoAll()
+
 
 
 
 #------- TESTBENCH --------
-b = blockchain()
-dateTime = str(datetime.datetime.now())
-blok1 = block(1, 4, dateTime, "kakak", "sender", "previousHash")
+# b = blockchain()
+# dateTime = str(datetime.datetime.now())
+# blok1 = block(1, 4, dateTime, "kakak", "sender", "previousHash")
+#
+#
+# textFromBlock = blockToText(blok1)
+# print(textFromBlock+"\n")
+# blockRecoverd =textToBlock(textFromBlock)
+# textRecoverd = blockToText(blockRecoverd)
+# print(textRecoverd+"\n")
+#
+#
+# b.__add__(blok1)
+# blok2 = block(4, 4, dateTime, "Ruben", "sender", b.get_lastblock().hash)
+# b.controle_add(blok2)
+#
+# print(b.get_lastblock().receiver)
+# authentification()
+blok1 = block(1, 4, "123", "kakak", "sender", "previousHash")
 
 
-textFromBlock = blockToText(blok1)
-print(textFromBlock+"\n")
-blockRecoverd =textToBlock(textFromBlock)
-textRecoverd = blockToText(blockRecoverd)
-print(textRecoverd+"\n")
-
-
-b.__add__(blok1)
-blok2 = block(4, 4, dateTime, "Ruben", "sender", b.get_lastblock().hash)
-b.controle_add(blok2)
-
-print(b.get_lastblock().receiver)
-authentification()
-
-
+#print('index '+str(blok1.index))
+main()
