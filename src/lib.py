@@ -66,7 +66,7 @@ class user():
 #-------------------------identifiers for conversations---------------------------------------------
 from enum import Enum
 class conversation(Enum):
-    sendBLock='a'
-    upToDate = 'b'
-    accepted = 'c'
-    notAccepted = 'd'
+    sendBLock="a"
+    upToDate = "b"
+    accepted = "c"
+    notAccepted = "d"

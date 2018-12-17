@@ -57,8 +57,9 @@ def readIp_neighbors(nodeNumber):
             with open(filename) as f:
                 content = f.readlines()
                 ip_address_neighbors = content[9 :]
-                # for i in ip_address_neighbors:
-                #     print(i)
+                for i in range(len(ip_address_neighbors)):
+                    ip_address_neighbors[i] = ip_address_neighbors[i].translate({ord(c): None for c in ' \n"'})
+
 
         return ip_address_neighbors
 
@@ -122,6 +123,14 @@ class block():
         i = str(index) + str(amount) + timestamp + receiver + sender + prevHash
         ans = hash(i)
         return (ans)
+
+    def print(self):
+        print(" index "+str(self.index))
+        print(" amount "+str(self.amount))
+        print(" timestamp "+self.timestamp)
+        print(" receiver "+self.receiver)
+        print(" prevHash "+self.prevHash)
+        print(" hash "+self.hash)
 # ---------------------------------------------------------------------------------
 
 
@@ -146,6 +155,7 @@ class blockchain():
         self.Blockchain_arr = []
         genesisBlock = block(0, 0, '0', 'I', 'you', 'genesis')
         self.Blockchain_arr.append(genesisBlock)
+
 
     def __add__(self, block_add):
         #add the given block to the blockchain
@@ -180,6 +190,10 @@ class blockchain():
         newblock = block(lastBlock.index+1 ,amount,dateTime, 'me','to',lastBlock.hash)
         self.__add__(newblock)
         return newblock
+    def print(self):
+        for i in range(len(self.Blockchain_arr)):
+            print("block "+str(i))
+            self.Blockchain_arr[i].print()
 
 b = blockchain()
 
@@ -197,11 +211,16 @@ def sendBlocksEoAll():
     #asking last index to neighbours
     #for not sending the same block 2 times
     list=readIp_neighbors(NUMBER_NODE)
-    for i in list:
-        Thread(target=sendBlock, args=(i)).start()
+    string = "127.0.1.1"
+    sendBlock(string)
+    #Thread(target=sendBlock, args=(string)).start()
+    for i in range(len(list)):
+        print(list[i])
+        #Thread(target=sendBlock, args=str(list[i])).start()
 
-def sendBlock(i):
-    soc =start_conversation_client(i,conversation.sendBLock)
+def sendBlock(string):
+    print(string)
+    soc =start_conversation_client(string, conversation.sendBLock)
 
     #what received
     result_string = read_connection(soc)
@@ -300,6 +319,7 @@ def main():
         money = input('how much do you want to give\n')
         who = input('to who\n')
         block = b.newTransaction(who,money)
+        b.print()
         sendBlocksEoAll()
 
 
@@ -324,8 +344,9 @@ def main():
 #
 # print(b.get_lastblock().receiver)
 # authentification()
-blok1 = block(1, 4, "123", "kakak", "sender", "previousHash")
+#blok1 = block(1, 4, "123", "kakak", "sender", "previousHash")
 
 
 #print('index '+str(blok1.index))
+conversation.accepted.enc
 main()
