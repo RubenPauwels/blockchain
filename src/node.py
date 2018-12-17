@@ -35,7 +35,7 @@ def start_conversation_client(i,conversationEnum):
 
     # open the socket
     iPaddresssServer = i
-    soc.connect((iPaddresssServer, src.lib.portNumber))#ip4 and tcp
+    soc.connect((iPaddresssServer, portNumber))#ip4 and tcp
     send_connection(soc, conversationEnum)#send kind of conversation
     return soc
 
@@ -180,5 +180,5 @@ def main():
 
 
 #print('index '+str(blok1.index))
-conversation.accepted.enc
+print(conversation.accepted._value_)
 main()

@@ -2,6 +2,7 @@
 import hashlib
 import sys
 import random
+import datetime
 import os
 
 
@@ -125,6 +126,16 @@ class block():
         i = str(index) + str(amount) + timestamp + receiver + sender + prevHash
         ans = hash(i)
         return (ans)
+
+    def print(self):
+        print(" index "+str(self.index))
+        print(" amount "+str(self.amount))
+        print(" timestamp "+self.timestamp)
+        print(" receiver "+self.receiver)
+        print(" prevHash "+self.prevHash)
+        print(" hash "+self.hash)
+
+
 class blockchain():
     def __init__(self):
         self.Blockchain_arr = []
@@ -157,7 +168,7 @@ class blockchain():
             self.__add__(block_incomming)
             return 1
         else:
-            index = b.get_lastblock().index
+            index = self.get_lastblock().index
             print("blok not added, should be blok" + str(index + 1))
             return 0
 
@@ -167,6 +178,10 @@ class blockchain():
         newblock = block(lastBlock.index + 1, amount, dateTime, 'me', 'to', lastBlock.hash)
         self.__add__(newblock)
         return newblock
+    def print(self):
+        for i in range(len(self.Blockchain_arr)):
+            print("block "+str(i))
+            self.Blockchain_arr[i].print()
 #-------------------------USer------------------------------
 class user():
     def __init__(self,userName,password):
