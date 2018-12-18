@@ -157,12 +157,13 @@ class block():
         print("--  hash\t\t"+self.hash)
 
 
+
 class blockchain():
     def __init__(self):
         self.Blockchain_arr = []
         genesisBlock = block(0, 0, '0', 'I', 'you', 'genesis')
         self.Blockchain_arr.append(genesisBlock)
-        self.BlockWaitingToBeAdd=None
+        self.blockWaitingToBeAdd=None
 
     def __add__(self, block_add):
         # add the given block to the blockchain
@@ -193,20 +194,34 @@ class blockchain():
             index = self.get_lastblock().index
             print("blok not added, should be blok" + str(index + 1))
             return 0
-
-    def newBlock(self, to, amount):
+    #make a block on top of the blockchain and set it on a waiting position until it can be add by calling 'addWaitingBlock'
+    def setWaitingBlock(self, to, amount):
         lastBlock = self.get_lastblock()
         dateTime = str(datetime.datetime.now())
-        self.BlockWaitingToBeAdd = block(lastBlock.index + 1, amount, dateTime, 'me', to, lastBlock.hash)
-        return self.BlockWaitingToBeAdd
-    def addWaitingBlock(self):
-        if self.controle_add(self.BlockWaitingToBeAdd):
-            self.BlockWaitingToBeAdd=None
+        self.blockWaitingToBeAdd = block(lastBlock.index + 1, amount, dateTime, 'me', to, lastBlock.hash)
+        return self.blockWaitingToBeAdd
+
+    #add the block that is waiting to ba add on top of the blockchain
+    def confirmWaitingBlock(self):
+        if self.controle_add(self.blockWaitingToBeAdd):
+            self.blockWaitingToBeAdd=None
             return 1
         else:
-            self.BlockWaitingToBeAdd = None
+            self.blockWaitingToBeAdd = None
             print ("big problem block cant be add in blockchain")
             return 0
+
+    def setWaitingBlockAssText(self, text):
+        blockToAdd = textToBlock(text)
+        self.blockWaitingToBeAdd = blockToAdd
+
+    def getWaitingBlockAsText(self):
+        return blockToText(self.blockWaitingToBeAdd)
+
+    def controle_add_text(self,text):
+        blockToAdd = textToBlock(text)
+        self.controle_add(blockToAdd)
+
 
     def print(self):
         print("--------------------------------------------------------------------------------")
@@ -244,8 +259,10 @@ class user():
 from enum import Enum
 
 class conversation(Enum):
-    sendBLock="send block"
-    upToDate = "up to date"
+    sendNewBLock="I want to send you my new block"
+    confirmNewBlock='my new block is  '
+    askStatusOfBLockchain="What is yours last block? if I have a newer block than you I will send it you"
+    upToDate = "you're up to date"
     accepted = "accepted"
-    notAccepted = "no accepted"
-    showBlockchain = "e"
+    notAccepted = "not accepted"
+    showBlockchain = "b"
