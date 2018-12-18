@@ -27,6 +27,21 @@ def authentification():
 
 
 b = blockchain()
+Neighbors=readIp_neighbors(NUMBER_NODE)
+
+def checkNeigborsResponse():
+    evryoneAnswered=1
+    answer=1
+    for i in range(len(Neighbors)):
+        evryoneAnswered = evryoneAnswered and Neighbors[i].hasResponded
+        answer = answer and Neighbors[i].responseValue
+    if evryoneAnswered:
+        if answer:
+            print('response: block accepted')
+        else:
+            print('response: blok not accepted')
+
+
 
 def start_conversation_client(ip, conversationEnumValue,ipSource):
     # open socket
@@ -43,38 +58,49 @@ def sendBlocksEoAll(ipSource, ip='optional'):
     #ip => ask not to this ip address
     #asking last index to neighbours
     #for not sending the same block 2 times
-    list=readIp_neighbors(NUMBER_NODE)
-    for i in range(len(list)):
-        if list[i]!=ip:
-            Thread(target=sendBlock, args=[ipSource,list[i]]).start()
+    for i in range(len(Neighbors)):
+        if Neighbors[i].ipAddress!=ip:
+            Neighbors[i].reset()
+            Thread(target=sendBlock, args=[ipSource, Neighbors[i]]).start()
+        else:
+            Neighbors[i].setTrue()
 
 
-def sendBlock(ipSource, ipDestination):
+def sendBlock(ipSource, neighbor):
     try:
-        soc =start_conversation_client(ipDestination, conversation.sendBLock._value_,ipSource)
+        soc =start_conversation_client(neighbor.ipAddress, conversation.sendBLock._value_, ipSource)
+
+        #what received
+        result_string = read_connection(soc, neighbor.ipAddress)
+        content = result_string.split('/')
+
+        #get last 4 chars of current last block
+        tempp= b.get_lastblock().hash
+        last4ofhashblockchain=tempp[-4:]
+
+        if int(content[0])==b.get_lastblock().index and last4ofhashblockchain==content[1]: #controll of last block of neigbor: hask + index
+            tosend = conversation.upToDate._value_
+        else:
+            tosend = blockToText(b.get_lastblock()) #sending the last block of the chain as text
+        send_connection(soc, tosend, neighbor.ipAddress)
+
+        answer = read_connection(soc, neighbor.ipAddress)
+        if answer== conversation.accepted._value_:
+            neighbor.responseValue=True
+
+        soc.close();
+
     except ConnectionRefusedError:
-        print("Terible error! could not connect with: " + ipDestination)
-        #import traceback
-        #traceback.print_exc()
-        return
+        print("Terible error! could not connect with: " + neighbor.ipAddress)
+    except:
+        print("Terible error! could not connect with: " + neighbor.ipAddress)
+        import traceback
+        traceback.print_exc()
+    finally:
+        neighbor.hasResponded = True
+        checkNeigborsResponse()
 
 
-    #what received
-    result_string = read_connection(soc, ipDestination)
-    content = result_string.split('/')
-
-    #get last 4 chars of current last block
-    tempp= b.get_lastblock().hash
-    last4ofhashblockchain=tempp[-4:]
-
-    if int(content[0])==b.get_lastblock().index and last4ofhashblockchain==content[1]:
-        tosend = conversation.ipToDate._value_
-    else:
-        tosend = blockToText(b.get_lastblock()) #sending the last block of the chain as text
-    send_connection(soc, tosend, ipDestination)
-
-    answer = read_connection(soc, ipDestination)
-    soc.close();
 #----------------------------serverside------------------------
 def receiveBlock(conn,ip):
     # get last 4 chars of current last block

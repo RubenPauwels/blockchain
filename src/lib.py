@@ -40,6 +40,20 @@ def send_connection(conn, text,ipSource="unknow"):
     print('[' + ipSource + '] send: ' + text)
     conn.sendall(text.encode("utf8"))
 
+#-------------------------neighbor--------------------------------------
+class neighbor():
+    def __init__(self, ipAddress):
+        self.ipAddress = ipAddress
+        self.hasResponded=False
+        self.responseValue = False
+    def reset(self):
+        self.hasResponded = False
+        self.responseValue = False
+    def setTrue(self):
+        self.hasResponded = True
+        self.responseValue = True
+
+
 #-------------------------Textfile readers------------------------------
 #input 1-6#output IP-adress
 def readIp_node(nodeNumber):
@@ -68,7 +82,8 @@ def readIp_reg(nodeNumber):
                 ip_address = ip_address[1]
 
         return ip_address
- #input 1-6#list of ip numbers of neighbors
+
+ #input 1-6#list of class Neighbor
 def readIp_neighbors(nodeNumber):
         filename = "../config/host_node"+str(nodeNumber)
         if not os.path.isfile(filename):
@@ -79,7 +94,9 @@ def readIp_neighbors(nodeNumber):
                 list = content[9 :]
                 ip_address_neighbors=[]
                 for i in range(len(list)):
-                    ip_address_neighbors.append(list[i].translate({ord(c): None for c in ' \n"'}))
+                    ipAddress = list[i].translate({ord(c): None for c in ' \n"'}) #remove white space and enter
+                    if ipAddress: #only ad not emptu ip
+                        ip_address_neighbors.append(neighbor(ipAddress))
                     #print(i)
 
         return ip_address_neighbors
@@ -107,6 +124,7 @@ def textToBlock(text):
     blockFromText = block(int(content[0]), int(content[1]), content[2], content[3], content[4], content[5])
     return blockFromText
 
+
 #-------------------------Block & Blockcha------------------------------
 class block():
     # this is a block
@@ -130,13 +148,13 @@ class block():
         return (ans)
 
     def print(self):
-        print("--  index "+str(self.index))
-        print("--  amount "+str(self.amount))
-        print("--  timestamp "+self.timestamp)
-        print("--  sender "+self.sender)
-        print("--  receiver "+self.receiver)
-        print("--  prevHash "+self.prevHash)
-        print("--  hash "+self.hash)
+        print("--  index\t\t"+str(self.index))
+        print("--  amount\t\t"+str(self.amount))
+        print("--  timestamp\t"+self.timestamp)
+        print("--  sender\t\t"+self.sender)
+        print("--  receiver\t"+self.receiver)
+        print("--  prevHash\t"+self.prevHash)
+        print("--  hash\t\t"+self.hash)
 
 
 class blockchain():
@@ -182,15 +200,15 @@ class blockchain():
         self.__add__(newblock)
         return newblock
     def print(self):
-        print("------------------------------------------------------------------------------")
-        print("-------------------------Blockchain-------------------------------------------")
-        print("------------------------------------------------------------------------------")
+        print("--------------------------------------------------------------------------------")
+        print("---------------------------Blockchain-------------------------------------------")
+        print("--------------------------------------------------------------------------------")
         for i in range(len(self.Blockchain_arr)):
-            print("--------------------block "+str(i)+"---------------------------------------")
+            print("---------------------------block "+str(i)+"----------------------------------------------")
             self.Blockchain_arr[i].print()
-        print("------------------------------------------------------------------------------")
-        print("-------------------------end of Blockchain------------------------------------")
-        print("------------------------------------------------------------------------------")
+        print("--------------------------------------------------------------------------------")
+        print("---------------------------end of Blockchain------------------------------------")
+        print("--------------------------------------------------------------------------------")
 
 #------------------------------------------------------USer--------------------------------------------------------------------
 class user():
