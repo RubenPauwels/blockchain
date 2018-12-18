@@ -162,6 +162,7 @@ class blockchain():
         self.Blockchain_arr = []
         genesisBlock = block(0, 0, '0', 'I', 'you', 'genesis')
         self.Blockchain_arr.append(genesisBlock)
+        self.BlockWaitingToBeAdd=None
 
     def __add__(self, block_add):
         # add the given block to the blockchain
@@ -193,12 +194,20 @@ class blockchain():
             print("blok not added, should be blok" + str(index + 1))
             return 0
 
-    def newTransaction(self, to, amount):
+    def newBlock(self, to, amount):
         lastBlock = self.get_lastblock()
         dateTime = str(datetime.datetime.now())
-        newblock = block(lastBlock.index + 1, amount, dateTime, 'me', to, lastBlock.hash)
-        self.__add__(newblock)
-        return newblock
+        self.BlockWaitingToBeAdd = block(lastBlock.index + 1, amount, dateTime, 'me', to, lastBlock.hash)
+        return self.BlockWaitingToBeAdd
+    def addWaitingBlock(self):
+        if self.controle_add(self.BlockWaitingToBeAdd):
+            self.BlockWaitingToBeAdd=None
+            return 1
+        else:
+            self.BlockWaitingToBeAdd = None
+            print ("big problem block cant be add in blockchain")
+            return 0
+
     def print(self):
         print("--------------------------------------------------------------------------------")
         print("---------------------------Blockchain-------------------------------------------")

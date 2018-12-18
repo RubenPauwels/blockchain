@@ -7,6 +7,11 @@ from threading import Thread
 
 NUMBER_NODE_temp = input("What client do you want to be?\n") #read from terminal
 NUMBER_NODE=int(NUMBER_NODE_temp)
+b = blockchain()
+Neighbors=readIp_neighbors(NUMBER_NODE)
+BlockWaitingToBeAdd=None
+
+
 
 #-----------------------------------------
 def authentification():
@@ -26,8 +31,7 @@ def authentification():
     return answer=="accept"
 
 
-b = blockchain()
-Neighbors=readIp_neighbors(NUMBER_NODE)
+
 
 def checkNeigborsResponse():
     evryoneAnswered=1
@@ -38,6 +42,7 @@ def checkNeigborsResponse():
     if evryoneAnswered:
         if answer:
             print('response: block accepted')
+            b.controle_add(blockWaitingToBeAdd)
         else:
             print('response: blok not accepted')
 
@@ -188,8 +193,8 @@ def main():
         else:
             amount = int(input('how much do you want to give\n'))
             who = input('to who\n')
-            b.newTransaction(who,amount)
-            sendBlocksEoAll(ipSource)
+            BlockWaitingToBeAdd =  b.newTransaction(who,amount)
+            sendBlocksEoAllWithCheck(ipSource)
 
 
 
