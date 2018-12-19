@@ -4,7 +4,7 @@ from src.lib import *
 def client_thread(conn, ip):
     input_text = read_connection(conn)
 
-    send_connection(conn,"send back same from server:"+input_text)# send it to client
+    send_connection(conn, "send back same from server:" + input_text)  # send it to client
     conn.close()  # close connection
     print('Connection ' + str(ip) + ':' + str(portNumber)+ " ended")
 

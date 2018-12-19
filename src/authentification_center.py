@@ -7,29 +7,31 @@ users = []
 #-------------------------------------------
 
 def client_thread(conn, ip):
-    username = read_connection(conn)
-    find=False;
-    for  x in users:
-        if username == x.username:
-            #find which client ask to authentificate
-            user = x
-            print(user.username+" ask for authentification "+ " pass "+user.password)
-            find=True
-            break
-    if find:
-        send_connection(conn,user.getNonce()) # send it to client the nonce as bytes
-        hashReceive = read_connection(conn)
+    try:
+        username = read_connection(conn)
+        find=False;
+        for  x in users:
+            if username == x.username:
+                #find which client ask to authentificate
+                user = x
+                print('['+conn.getpeername()[0]+']',user.username+" ask for authentification "+ " password= "+user.password)
+                find=True
+                break
+        if find:
+            send_connection(conn, user.getNonce())  # send it to client the nonce as bytes
+            hashReceive = read_connection(conn)
 
-        if(user.check(hashReceive)) :
-            send_connection(conn,"accept")
-        else :
-            send_connection(conn,"not accept")
+            if(user.check(hashReceive)) :
+                send_connection(conn, conversation.accepted.value)
+            else :
+                send_connection(conn, conversation.notAccepted.value)
 
-        conn.close()  # close connection
-        print('Connection ' + str(ip) + ':' + str(portNumber)+ " ended")
-    else:
-        send_connection(conn,"bad username")
-        print('not find username')
+            print('['+conn.getpeername()[0]+']','Connection ' + str(ip) + ':' + str(portNumber)+ " ended")
+        else:
+            send_connection(conn, "bad username")
+            print('['+conn.getpeername()[0]+']','not find username')
+    finally:
+        conn.close() # close connection
 
 def start_server():
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

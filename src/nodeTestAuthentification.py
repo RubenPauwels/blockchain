@@ -12,9 +12,9 @@ def idetification():
     thisUser = user('user1' , 'unicorn')
 
 
-    send_connection(soc,thisUser.username)  #send username to auth center
-    nonce = read_connection(soc)    #receive nonce
-    send_connection(soc,thisUser.setNonce(nonce))   #send back hash
+    send_connection(soc, thisUser.username)  #send username to auth center
+    nonce = read_connection(soc)  #receive nonce
+    send_connection(soc, thisUser.setNonce(nonce))  #send back hash
 
     answer = read_connection(soc)
     print(answer)

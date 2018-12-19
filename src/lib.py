@@ -29,15 +29,15 @@ def read_bytes(conn):
     return input
 
 #return the input of socket as text
-def read_connection(conn,ipSource="unknow"):
+def read_connection(conn):
     # decode input and strip the end of line
     text = read_bytes(conn).decode("utf8").rstrip()
-    print('['+ipSource+'] receive: '+text)
+    print('['+conn.getpeername()[0]+'] receive: '+text)
     return text
 def send_bytes(conn, bytes):
     conn.sendall(bytes)
-def send_connection(conn, text,ipSource="unknow"):
-    print('[' + ipSource + '] send: ' + text)
+def send_connection(conn, text):
+    print('[' + conn.getpeername()[0] + '] send: ' + text)
     conn.sendall(text.encode("utf8"))
 
 #-------------------------neighbor--------------------------------------
@@ -46,12 +46,15 @@ class neighbor():
         self.ipAddress = ipAddress
         self.hasResponded=False
         self.responseValue = False
+        self.connection =None
     def reset(self):
         self.hasResponded = False
         self.responseValue = False
     def setTrue(self):
         self.hasResponded = True
         self.responseValue = True
+    def setConnectio(self,conn):
+        self.connection = conn
 
 
 #-------------------------Textfile readers------------------------------
@@ -120,12 +123,11 @@ def blockToText(block):
     return text
 def textToBlock(text):
     content = text.split('/')
-    print(content)
     blockFromText = block(int(content[0]), int(content[1]), content[2], content[3], content[4], content[5])
     return blockFromText
 
 
-#-------------------------Block & Blockcha------------------------------
+#-------------------------Block & Blockchain------------------------------
 class block():
     # this is a block
     def __init__(self, index, amount, timestamp, receiver, sender, prevHash):
@@ -211,9 +213,13 @@ class blockchain():
             print ("big problem block cant be add in blockchain")
             return 0
 
-    def setWaitingBlockAssText(self, text):
+    def setWaitingBlockAsText(self, text):
         blockToAdd = textToBlock(text)
-        self.blockWaitingToBeAdd = blockToAdd
+        if self.controle(blockToAdd):
+            self.blockWaitingToBeAdd = blockToAdd
+            return 1
+        else:
+            return 0
 
     def getWaitingBlockAsText(self):
         return blockToText(self.blockWaitingToBeAdd)
@@ -259,10 +265,18 @@ class user():
 from enum import Enum
 
 class conversation(Enum):
-    sendNewBLock="I want to send you my new block"
-    confirmNewBlock='my new block is  '
-    askStatusOfBLockchain="What is yours last block? if I have a newer block than you I will send it you"
+    sendNewBLock="I want to send you my new block, can you check it?"
+    confirmNewBlock='my new block is confirmed by everyone, add it to your blockchain '
+    askStatusOfBLockchain="What is yours last block? If I have a newer block than you I will send it you"
     upToDate = "you're up to date"
     accepted = "accepted"
     notAccepted = "not accepted"
     showBlockchain = "b"
+
+
+
+def inputUser(text):
+    return input("\x1b[47;34m"+ text+"\x1b[0m")
+
+def printUser(text):
+    print("\x1b[47;34m" + text + "\x1b[0m")

@@ -12,7 +12,7 @@ soc.connect((iPaddresssServer, src.lib.portNumber))
 
 clients_input = input("What you want to proceed my dear client?\n") #read from terminal
 
-send_connection(soc,clients_input) # we must encode the string to bytes
+send_connection(soc, clients_input)  # we must encode the string to bytes
 
 result_string = read_connection(soc)
 soc.close();

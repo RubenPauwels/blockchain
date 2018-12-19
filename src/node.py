@@ -5,33 +5,37 @@ import socket
 from threading import Thread
 import time
 
-NUMBER_NODE_temp = input("What client do you want to be?\n") #read from terminal
+NUMBER_NODE_temp = inputUser("What client do you want to be?\n") #read from terminal
 NUMBER_NODE=int(NUMBER_NODE_temp)
 b = blockchain()
 Neighbors=readIp_neighbors(NUMBER_NODE)
 BlockWaitingToBeAdd=None
-
+IpOfThisNode = readIp_node(NUMBER_NODE)
 
 
 #-----------------------------------------
 def authentification():
+    try:
+        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        soc.connect((ipAuthentification, portNumber))
+        thisUser = readUser(NUMBER_NODE)
+        send_connection(soc, thisUser.username)  #send username to auth center
+        nonce = read_connection(soc)  #receive nonce
+        send_connection(soc, thisUser.setNonce(nonce))  #send back hash
 
-    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    soc.connect((ipAuthentification, portNumber))
-    thisUser = readUser(NUMBER_NODE)
-    ipSource="authentification center"
-    send_connection(soc,thisUser.username,ipSource)  #send username to auth center
-    nonce = read_connection(soc,ipSource)    #receive nonce
-    send_connection(soc,thisUser.setNonce(nonce),ipSource)   #send back hash
+        answer = read_connection(soc)
+        print(answer)
 
-    answer = read_connection(soc,ipSource)
-    print(answer)
-
-    soc.close();
-    return answer=="accept"
+        soc.close();
+        return answer==conversation.accepted.value
+    except:
+        return 0
 
 
 
+def sendConfirmatioOfNewBlock( neighbor):
+    toSend = conversation.confirmNewBlock.value
+    send_connection(neighbor.connection, toSend)
 
 def checkNeigborsResponse():
     evryoneAnswered=1
@@ -43,53 +47,58 @@ def checkNeigborsResponse():
         if answer:
             print('response: block added to the blockchain')
             b.confirmWaitingBlock()
+            for i in range(len(Neighbors)):
+                Thread(target=sendConfirmatioOfNewBlock, args=[ Neighbors[i]]).start()
+
+
         else:
             print('response: blok not accepted')
 
 
 
-def start_conversation_client(ip, conversationEnumValue,ipSource):
+def start_conversation_client(ip, conversationEnumValue):
     # open socket
     print('start soc with '+ip+':'+str(portNumber))
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # AF_INET = Ip4, STREAM = TCP
-    soc.bind((ipSource,0))
+    soc.bind((IpOfThisNode,0))
     # open the socket
     iPaddresssServer = ip
     soc.connect((iPaddresssServer, portNumber))#ip4 and tcp
-    send_connection(soc, conversationEnumValue,ip)#send kind of conversation
+    send_connection(soc, conversationEnumValue)  #send kind of conversation
     return soc
 
-def sendBlocksToAllWithCheck(ipSource, ip='optional'):
+def sendBlocksToAllWithCheck(ip='optional'):
     #ip => ask not to this ip address
     #asking last index to neighbours
     #for not sending the same block 2 times
     for i in range(len(Neighbors)):
         if Neighbors[i].ipAddress!=ip:
             Neighbors[i].reset()
-            Thread(target=sendNewBlockWithCheck, args=[ipSource, Neighbors[i]]).start()
+            Thread(target=sendNewBlockWithCheck, args=[ Neighbors[i]]).start()
         else:
             Neighbors[i].setTrue()
 
-def sendBlocksToAll(ipSource, ip='optional'):
+def sendBlocksToAll(ip='optional'):
     #ip => ask not to this ip address
     #asking last index to neighbours
     #for not sending the same block 2 times
     for i in range(len(Neighbors)):
-        if Neighbors[i].ipAddress!=ip:
+        if Neighbors[i].ipAddress!=ip and neighbor.connection ==None:
             Neighbors[i].reset()
-            Thread(target=sendBlock, args=[ipSource, Neighbors[i]]).start()
+
+            Thread(target=sendBlock, args=[ Neighbors[i]]).start()
         else:
             Neighbors[i].setTrue()
 
 
 
 #send a block that you have receive from one of your neighbors to your other neighbors. first you have to ask if they already have this new block or not
-def sendBlock(ipSource, neighbor):
+def sendBlock(neighbor):
     try:
-        soc =start_conversation_client(neighbor.ipAddress, conversation.askStatusOfBLockchain._value_, ipSource)
-
+        soc = start_conversation_client(neighbor.ipAddress, conversation.askStatusOfBLockchain._value_)
+        neighbor.setConnectio(soc)
         #what received
-        result_string = read_connection(soc, neighbor.ipAddress)
+        result_string = read_connection(soc)
         content = result_string.split('/')
 
         #get last 4 chars of current last block
@@ -98,15 +107,18 @@ def sendBlock(ipSource, neighbor):
 
         if int(content[0])==b.get_lastblock().index and last4ofhashblockchain==content[1]: #controll of last block of neigbor: hask + index
             tosend = conversation.upToDate._value_
+            send_connection(soc, tosend)
+            neighbor.responseValue = True
+
         else:
             tosend = blockToText(b.get_lastblock()) #sending the last block of the chain as text
-        send_connection(soc, tosend, neighbor.ipAddress)
+            send_connection(soc, tosend)
 
-        answer = read_connection(soc, neighbor.ipAddress)
-        if answer== conversation.accepted._value_:
-            neighbor.responseValue=True
-
-        soc.close();
+            answer = read_connection(soc)
+            if answer== conversation.accepted._value_:
+                neighbor.responseValue=True
+            else:
+                print("problem in the blockchain. neighbor doesn't accept confirmed block "+neighbor.ipAddress)
 
     except ConnectionRefusedError:
         print("Terible error! could not connect with: " + neighbor.ipAddress)
@@ -114,25 +126,28 @@ def sendBlock(ipSource, neighbor):
         print("Terible error with: " + neighbor.ipAddress)
         import traceback
         traceback.print_exc()
+        soc.close()
     finally:
         neighbor.hasResponded = True
 
 #send a new block that thos node just has made to his neighbors, if the all neighbors accept the block, the block can be add to the blockchain
-def sendNewBlockWithCheck(ipSource, neighbor):
+def sendNewBlockWithCheck(neighbor):
     try:
-        soc =start_conversation_client(neighbor.ipAddress, conversation.sendNewBLock._value_, ipSource)#start connection and specify kind of conversation = new block is goig to be send
+        soc = start_conversation_client(neighbor.ipAddress,
+                                        conversation.sendNewBLock._value_)  #start connection and specify kind of conversation = new block is goig to be send
+        neighbor.setConnectio(soc)
         time.sleep(0.5)
         #sending the new Block
         toSend  = b.getWaitingBlockAsText()
-        send_connection(soc,toSend,neighbor.ipAddress)
+        send_connection(soc, toSend)
 
         #Is the block accepted or not by th neigbor?
-        answer = read_connection(soc, neighbor.ipAddress)
+        answer = read_connection(soc)
         if answer== conversation.accepted._value_:
             #block is accepted
             neighbor.responseValue=True
 
-        soc.close();
+
 
     except ConnectionRefusedError:
         print("Terible error! could not connect with: " + neighbor.ipAddress)
@@ -153,9 +168,9 @@ def receiveBlock(conn,ip):
     last4ofhashblockchain = tempp[-4:]
     toSend = str(b.get_lastblock().index) +'/'+ last4ofhashblockchain
 
-    send_connection(conn,toSend,ip)
+    send_connection(conn, toSend)
 
-    receive = read_connection(conn,ip)
+    receive = read_connection(conn)
     if receive == conversation.upToDate._value_:
         return
     else:
@@ -163,45 +178,41 @@ def receiveBlock(conn,ip):
         if b.controle_add(blockIncoming):
             send=conversation.accepted._value_
             ipSource = readIp_node(NUMBER_NODE)
-            send_connection(conn, send, ip)
-            sendBlocksToAll(ipSource, ip)
+            send_connection(conn, send)
+            sendBlocksToAll(ip)
 
         else:
             send=conversation.notAccepted._value_
-            send_connection(conn,send,ip)
+            send_connection(conn, send)
 
 def receiveNewBlock(conn,ip):
-    receive = read_connection(conn, ip)
-    blockIncoming = textToBlock(receive)
-    if b.controle_add(blockIncoming):
+    receivedBlockAsText = read_connection(conn)
+    if b.setWaitingBlockAsText(receivedBlockAsText):
         send = conversation.accepted._value_
-        send_connection(conn, send, ip)
-        receiveconfirmation =  read_connection(conn, ip)
-        if receiveconfirmation
-
-
-        ipSource = readIp_node(NUMBER_NODE)
-        sendBlocksToAll(ipSource, ip)
+        send_connection(conn, send)
+        receiveconfirmation = read_connection(conn)
+        if receiveconfirmation:
+            b.confirmWaitingBlock()
+            ipSource = readIp_node(NUMBER_NODE)
+            sendBlocksToAll(ip)
 
     else:
         send = conversation.notAccepted._value_
-        send_connection(conn, send, ip)
+        send_connection(conn, send)
 
 
-    ipSource = readIp_node(NUMBER_NODE)
-    sendBlocksToAll(ipSource, ip)
+def Connection_as_server(conn, ip):
 
-def Connection_as_server(conn, ipSource):
-    identification_code = read_connection(conn,ipSource)#read first message with tag to know subject of conversation
+    identification_code = read_connection(conn)  #read first message with tag to know subject of conversation
 
     if identification_code==conversation.askStatusOfBLockchain._value_:
         #get a request for updating of blockchain
-        receiveBlock(conn,ipSource)
+        receiveBlock(conn, ip)
     elif identification_code == conversation.sendNewBLock._value_:
-        receiveNewBlock(conn,ipSource)
+        receiveNewBlock(conn, ip)
 
     conn.close()  # close connection
-    print('Connection ' + str(ipSource) + ':' + str(portNumber)+ " ended")
+    print('Connection ' + str(ip) + ':' + str(portNumber) + " ended")
 
 
 def start_server():
@@ -248,14 +259,14 @@ def main():
     Thread(target=start_server).start()
     ipSource = readIp_node(NUMBER_NODE)
     while(True):
-        inputText = input("to sho blockshain press'" + conversation.showBlockchain._value_+"', to make a transaction press everithing else'\n")
+        inputText = inputUser("to show blockshain press '" + conversation.showBlockchain._value_ + "', to make a transaction press everithing else\n")
         if inputText ==conversation.showBlockchain._value_:
             b.print()
         else:
-            amount = int(input('how much do you want to give\n'))
-            who = input('to who\n')
+            amount = int(inputUser('how much do you want to give\n'))
+            who = inputUser('to who\n')
             BlockWaitingToBeAdd =  b.setWaitingBlock(who, amount)
-            sendBlocksToAllWithCheck(ipSource)
+            sendBlocksToAllWithCheck()
 
 
 

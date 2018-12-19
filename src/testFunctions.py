@@ -1,2 +1,2 @@
-str = "*****this  ***is string example....wow!!!*****"
-print (str.strip( '*' ))
+name="ik"
+print(f'{name} ask for authentification  pass ')
