@@ -9,7 +9,7 @@ def idetification():
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     soc.connect((ipAuthentification, portNumber))
-    thisUser = user('user1' , 'unicorn')
+    thisUser = user('user1', 'unicorn', None)
 
 
     send_connection(soc, thisUser.username)  #send username to auth center
