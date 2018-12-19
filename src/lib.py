@@ -53,7 +53,7 @@ class neighbor():
     def setTrue(self):
         self.hasResponded = True
         self.responseValue = True
-    def setConnectio(self,conn):
+    def setConnection(self, conn):
         self.connection = conn
 
 
@@ -266,9 +266,11 @@ from enum import Enum
 
 class conversation(Enum):
     sendNewBLock="I want to send you my new block, can you check it?"
-    confirmNewBlock='my new block is confirmed by everyone, add it to your blockchain '
-    askStatusOfBLockchain="What is yours last block? If I have a newer block than you I will send it you"
-    upToDate = "you're up to date"
+    confirmNewBlock='my new block is confirmed by everyone, add it to your blockchain'
+    notConfirmNewBlock = "my new block is not confirmed by everyone, don't it to your blockchain"
+    askStatusOfBLockchain="this is my latest block? If I have a newer block than you I will send it you"
+    ImUpToDate = "I'm up to date"
+    ImNotUpToDate = "I'm not up to date"
     accepted = "accepted"
     notAccepted = "not accepted"
     showBlockchain = "b"
