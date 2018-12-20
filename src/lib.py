@@ -192,17 +192,17 @@ class blockchain():
 
     def controle_add(self, block_incomming):
         #no 2 threads can do this at the same time
-        with self.lock:
-            # controle if block may be added, if yes add
-            if self.controle(block_incomming):
-                self.__add__(block_incomming)
-                return 1
-            elif block_incomming.index==self.get_lastblock().index:
-                return 1
-            else:
-                index = self.get_lastblock().index
-                print("blok not added, should be blok" + str(index + 1))
-                return 0
+
+        # controle if block may be added, if yes add
+        if self.controle(block_incomming):
+            self.__add__(block_incomming)
+            return 1
+        elif block_incomming.index==self.get_lastblock().index:
+            return 1
+        else:
+            index = self.get_lastblock().index
+            print("blok not added, should be blok" + str(index + 1))
+            return 0
     #make a block on top of the blockchain and set it on a waiting position until it can be add by calling 'addWaitingBlock'
     def setWaitingBlock(self, to, amount):
         lastBlock = self.get_lastblock()
@@ -254,11 +254,8 @@ class user():
         self.nonce = 0
 
     def setPasswordAndSalt(self,password,salt):
-        print("password:"+password)
-        print("salt:"+salt)
         self.saltedPasswordHash = generateHash(password + salt)
 
-        print("saltedPasswordHash:"+self.saltedPasswordHash)
 
     def setHashSaltedPassword(self, saltedUserNameHash):
         self.saltedPasswordHash=saltedUserNameHash
@@ -274,7 +271,6 @@ class user():
         return str(generateHash(self.saltedPasswordHash + self.nonce))
 
     def setNonce(self, nonce):
-        print("nonce:"+nonce)
         self.nonce = nonce
         return self.getHashWithNonce()
 
@@ -289,10 +285,10 @@ class user():
 from enum import Enum
 
 class conversation(Enum):
-    sendNewBLock="I want to send you my new block, can you check it?"
+    sendCreatedBLock= "I want to send you my new block, can you check it?"
     confirmNewBlock='my new block is confirmed by everyone, add it to your blockchain'
     notConfirmNewBlock = "my new block is not confirmed by everyone, don't it to your blockchain"
-    askStatusOfBLockchain="this is my latest block? If I have a newer block than you I will send it you"
+    distribution= "this is my latest block? If I have a newer block than you I will send it you"
     ImUpToDate = "I'm up to date"
     ImNotUpToDate = "I'm not up to date"
     accepted = "accepted"

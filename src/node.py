@@ -17,13 +17,11 @@ IpOfThisNode = readIp_node(NUMBER_NODE)
 def authentification():
     try:
         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        soc.bind((IpOfThisNode, 0))
         soc.connect((ipAuthentification, portNumber))
         thisUser = readUser(NUMBER_NODE)
         send_connection(soc, thisUser.username)  #send username to auth center
         nonce = read_connection(soc)  #receive nonce
-        print("user:"+thisUser.username)
-        print("saltedPassword:"+ thisUser.getHashSaltedPassword())
-        print("nonce:"+nonce)
         send_connection(soc, thisUser.setNonce(nonce))  #send back hash
 
         answer = read_connection(soc)
@@ -110,7 +108,7 @@ def sendBlock(neighbor):
         firstContent = str(b.get_lastblock().index) + '/' + last4ofhashblockchain
 
         #start socket
-        soc = start_conversation_client(neighbor.ipAddress, conversation.askStatusOfBLockchain._value_,firstContent)
+        soc = start_conversation_client(neighbor.ipAddress, conversation.distribution._value_, firstContent)
         #remember socket
         neighbor.setConnection(soc)
 
@@ -140,7 +138,7 @@ def sendBlock(neighbor):
 def sendNewBlockWithCheck(neighbor):
     try:
         # start connection and specify kind of conversation = new block is goig to be send and send waiting block
-        soc = start_conversation_client(neighbor.ipAddress,  conversation.sendNewBLock._value_,b.getWaitingBlockAsText())
+        soc = start_conversation_client(neighbor.ipAddress, conversation.sendCreatedBLock._value_, b.getWaitingBlockAsText())
         neighbor.setConnection(soc)
 
 
@@ -193,44 +191,64 @@ def receiveBlock(conn, contentFirstMessage):
             send=conversation.notAccepted._value_
             send_connection(conn, send)
 
-def receiveNewBlock(conn, contentFirstMessage):
+def validateCreatedBlock(conn, contentFirstMessage):
+    #the first message contains the created block as Text
     receivedBlockAsText = contentFirstMessage
+
+    #the created block is controlled and if accept stored to be add in the blockchain
     if b.setWaitingBlockAsText(receivedBlockAsText):
-        send = conversation.accepted._value_
-        send_connection(conn, send)
+        #send back to the creater of the block that we accept the block
+        toSend = conversation.accepted._value_
+        send_connection(conn, toSend)
+
+        #we received the final confirmation from the creator of the block
         receiveConfirmation = read_connection(conn)
-        print("rec "+receiveConfirmation)
-        print("rec "+conversation.confirmNewBlock.value)
-        print("rec "+conversation.confirmNewBlock.value==receiveConfirmation)
+
+        # the final confirmation said that the block has been approved by everyone
         if receiveConfirmation==conversation.confirmNewBlock.value:
+            #We add the block to our blockchain
             b.confirmWaitingBlock()
+            #we distribute this new block to our neighbors (except to the neighbor that created the block)
             sendBlocksToAll(conn.getpeername()[0])
+            #the user is informd that a new block has been added to the chain
             printUser("an new block is aded to the blockchain by "+conn.getpeername()[0]+" press "+conversation.showBlockchain._value_+" to see the blockchain")
+
+        # the final confirmation said that the block has NOT been approved by everyone
         else:
+            # the user is informd that a neighbor try to create a new blockbut failed
             printUser( conn.getpeername()[0]+" try to add a new block to the chain, but the block was not accepted press "+conversation.showBlockchain._value_+" to see the blockchain press "+conversation.showBlockchain._value_+" to see the blockchain")
 
-
+    # the created block was controlled but not approved
     else:
-        send = conversation.notAccepted._value_
-        send_connection(conn, send)
+        # send back to the creater of the block that we NOT accept the block
+        toSend = conversation.notAccepted._value_
+        send_connection(conn, toSend)
+        #conversation is done, the creator will inform everyone that the block can not be added to the blockchain
 
 
 
 def Connection_as_server(conn, ip):
     try:
-        read = read_connection(conn).split('/', 1) #read first message and split into tag and content
+        # read first message and split into tag and content
+        read = read_connection(conn).split('/', 1)
 
-        identification_code = read[0]  # tag to know subject of conversation
+        #fisrt part of the message is a tag to know todetermine the subject of conversation
+        identification_code = read[0]
+        #the second part of the message is content for the conversation
         contentFirstMessage = read[1]
 
-        if identification_code==conversation.askStatusOfBLockchain.value:
-            #get a request for updating of blockchain
+        # the tag indicate that this message is about distribution algoritm
+        if identification_code==conversation.distribution.value:
+            #start distribution conversation
             receiveBlock(conn, contentFirstMessage)
-        elif identification_code == conversation.sendNewBLock.value:
-            receiveNewBlock(conn, contentFirstMessage)
 
-        print('Connection', conn.getpeername()[0], ':' + str(portNumber) + " ended")
+        # the tag indicate that this message is about validation of a new created block algoritm
+        elif identification_code == conversation.sendCreatedBLock.value:
+            # start validation conversation
+            validateCreatedBlock(conn, contentFirstMessage)
+
     finally:
+        print('Connection', conn.getpeername()[0], ':' + str(portNumber) + " ended")
         conn.close()  # close connection
 
 
@@ -254,8 +272,7 @@ def start_server():
     print('Socket now listening on '+str(ipaddress))
 
 
-    # this will make an infinite loop needed for
-    # not reseting server for every client
+    # this will make an infinite loop needed for not reseting server for every client
     while True:
         conn, addr = soc.accept()
         ip, port = str(addr[0]), str(addr[1])

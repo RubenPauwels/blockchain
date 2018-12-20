@@ -4,40 +4,50 @@ from src.lib import *
 
 users = []
 
-#-------------------------------------------
 
 def client_thread(conn, ip):
     try:
+        #get username of node that wants to authentificate
         username = read_connection(conn)
+
+        #initialise value
         find=False;
+
+        #iterate over all users to find corrspondig User in our database
         for  x in users:
             if username == x.username:
                 #find which client ask to authentificate
                 user = x
-                print('['+conn.getpeername()[0]+']',user.username+" ask for authentification ")
+
+                #we find someone
                 find=True
                 break
+
+        #if we find the user
         if find:
-            send_connection(conn, user.generateNewNonce())  # send it to client the nonce as bytes
+            # send to the node a nonce
+            send_connection(conn, user.generateNewNonce())
+
+            #receive back the hash
             hashReceive = read_connection(conn)
-            print("user:" + user.username)
-            print("saltedPassword:" + user.saltedPasswordHash)
-            print("nonce:" + user.nonce)
 
-
-
-            print("hashnoncereceive:",hashReceive)
-            print("must be",user.getHashWithNonce())
+            #the hash is good
             if(user.check(hashReceive)) :
+                #sent to the user that he is authentificate
                 send_connection(conn, conversation.accepted.value)
+
+            #the hash is NOT good
             else :
+                # sent to the user that he is NOT authentificate
                 send_connection(conn, conversation.notAccepted.value)
 
-            print('['+conn.getpeername()[0]+']','Connection ' + str(ip) + ':' + str(portNumber)+ " ended")
+        #there is no one with that username in our database
         else:
             send_connection(conn, "bad username")
             print('['+conn.getpeername()[0]+']','not find username')
     finally:
+        #conversation ended
+        print('[' + conn.getpeername()[0] + ']', 'Connection ' + str(ip) + ':' + str(portNumber) + " ended")
         conn.close() # close connection
 
 def start_server():

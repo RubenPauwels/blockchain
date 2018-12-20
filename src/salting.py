@@ -18,7 +18,7 @@ for nodeNumber in range(1,7):
         with open(nodeFile) as f:
             content = f.readlines()
 
-            salt = str(random.getrandbits(2))
+            salt = str(random.getrandbits(100))
             content[7] = "salting = " +salt+"\n"
             f.close()
 

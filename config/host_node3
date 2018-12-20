@@ -5,7 +5,7 @@ username = "user3"
 [registration]
 ip_address = 127.0.0.10
 secret = "unicorn"
-salting = 2
+salting = 852199439271667454657377348322
 [neighbours]
 127.0.1.1
 127.0.2.1
