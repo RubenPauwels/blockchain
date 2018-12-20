@@ -31,15 +31,12 @@ def authentification():
     except:
         return 0
 
-
-
 def sendConfirmatioOfNewBlock(neighbor, accepted):
     if accepted:
         toSend = conversation.confirmNewBlock.value
     else:
         toSend = conversation.notConfirmNewBlock.value
     send_connection(neighbor.connection, toSend)
-
 def checkNeigborsResponse():
     evryoneAnswered=1
     answer=1
@@ -62,7 +59,6 @@ def checkNeigborsResponse():
                 if Neighbors[i].responseValue:
                     Thread(target=sendConfirmatioOfNewBlock, args=[Neighbors[i],accepted]).start()
 
-
 def start_conversation_client(ip, conversationEnumValue, contentFirstMessage=None):
     # open socket
     print('start soc with '+ip+':'+str(portNumber))
@@ -73,7 +69,6 @@ def start_conversation_client(ip, conversationEnumValue, contentFirstMessage=Non
     soc.connect((iPaddresssServer, portNumber))#ip4 and tcp
     send_connection(soc, conversationEnumValue+"/"+contentFirstMessage)  #send kind of conversation + first content of conversation
     return soc
-
 def sendBlocksToAllWithCheck(ip='optional'):
     #ip => ask not to this ip address
     #asking last index to neighbours
@@ -84,7 +79,6 @@ def sendBlocksToAllWithCheck(ip='optional'):
             Thread(target=sendNewBlockWithCheck, args=[ Neighbors[i]]).start()
         else:
             Neighbors[i].setTrue()
-
 def sendBlocksToAll(ip='optional'):
     #ip => ask not to this ip address
     #asking last index to neighbours
@@ -96,8 +90,6 @@ def sendBlocksToAll(ip='optional'):
             Thread(target=sendBlock, args=[ Neighbors[i]]).start()
         else:
             Neighbors[i].setTrue()
-
-
 
 #send a block that you have receive from one of your neighbors to your other neighbors. first you have to ask if they already have this new block or not
 def sendBlock(neighbor):
@@ -132,7 +124,6 @@ def sendBlock(neighbor):
         soc.close()
     finally:
         neighbor.hasResponded = True
-
 #send a new block that thos node just has made to his neighbors, if the all neighbors accept the block, the block can be add to the blockchain
 def sendNewBlockWithCheck(neighbor):
     try:
@@ -159,7 +150,6 @@ def sendNewBlockWithCheck(neighbor):
         # conversation with this neighbor is done
         neighbor.hasResponded = True
         checkNeigborsResponse()
-
 
 #----------------------------serverside------------------------
 def receiveBlock(conn, contentFirstMessage):
@@ -189,7 +179,6 @@ def receiveBlock(conn, contentFirstMessage):
         else:
             send=conversation.notAccepted._value_
             send_connection(conn, send)
-
 def receiveNewBlock(conn, contentFirstMessage):
     receivedBlockAsText = contentFirstMessage
     if b.setWaitingBlockAsText(receivedBlockAsText):
@@ -202,7 +191,7 @@ def receiveNewBlock(conn, contentFirstMessage):
         if receiveConfirmation==conversation.confirmNewBlock.value:
             b.confirmWaitingBlock()
             sendBlocksToAll(conn.getpeername()[0])
-            printUser("an new block is aded to the blockchain by "+conn.getpeername()[0]+" press "+conversation.showBlockchain._value_+" to see the blockchain")
+            printUser("a new block is added to the blockchain by "+conn.getpeername()[0]+" press "+conversation.showBlockchain._value_+" to see the blockchain")
         else:
             printUser( conn.getpeername()[0]+" try to add a new block to the chain, but the block was not accepted press "+conversation.showBlockchain._value_+" to see the blockchain press "+conversation.showBlockchain._value_+" to see the blockchain")
 
@@ -210,8 +199,6 @@ def receiveNewBlock(conn, contentFirstMessage):
     else:
         send = conversation.notAccepted._value_
         send_connection(conn, send)
-
-
 
 def Connection_as_server(conn, ip):
     try:
@@ -229,7 +216,6 @@ def Connection_as_server(conn, ip):
         print('Connection', conn.getpeername()[0], ':' + str(portNumber) + " ended")
     finally:
         conn.close()  # close connection
-
 
 def start_server():
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -266,8 +252,6 @@ def start_server():
     soc.close()
 
 #-----------------main---------------------------
-
-
 def main():
     if not authentification():
         print('not authentificate')
@@ -281,11 +265,7 @@ def main():
         else:
             amount = int(inputUser('how much do you want to give\n'))
             who = inputUser('to who\n')
-            BlockWaitingToBeAdd =  b.setWaitingBlock(who, amount)
+            BlockWaitingToBeAdd = b.setWaitingBlock(who, amount, NUMBER_NODE)
             sendBlocksToAllWithCheck()
-
-
-
-
 
 main()
