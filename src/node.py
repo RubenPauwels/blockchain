@@ -21,6 +21,9 @@ def authentification():
         thisUser = readUser(NUMBER_NODE)
         send_connection(soc, thisUser.username)  #send username to auth center
         nonce = read_connection(soc)  #receive nonce
+        print("user:"+thisUser.username)
+        print("saltedPassword:"+ thisUser.getHashSaltedPassword())
+        print("nonce:"+nonce)
         send_connection(soc, thisUser.setNonce(nonce))  #send back hash
 
         answer = read_connection(soc)

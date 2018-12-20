@@ -14,13 +14,20 @@ def client_thread(conn, ip):
             if username == x.username:
                 #find which client ask to authentificate
                 user = x
-                print('['+conn.getpeername()[0]+']',user.username+" ask for authentification "+ " password= "+user.password)
+                print('['+conn.getpeername()[0]+']',user.username+" ask for authentification ")
                 find=True
                 break
         if find:
-            send_connection(conn, user.getNonce())  # send it to client the nonce as bytes
+            send_connection(conn, user.generateNewNonce())  # send it to client the nonce as bytes
             hashReceive = read_connection(conn)
+            print("user:" + user.username)
+            print("saltedPassword:" + user.saltedPasswordHash)
+            print("nonce:" + user.nonce)
 
+
+
+            print("hashnoncereceive:",hashReceive)
+            print("must be",user.getHashWithNonce())
             if(user.check(hashReceive)) :
                 send_connection(conn, conversation.accepted.value)
             else :
@@ -75,9 +82,11 @@ def readUserFile():
         lines= f.readlines()
     for line in lines:
         values = line.replace('\n','').split(" ")
-        users.append(user(values[0],values[1]))
+        newUser = user(values[0])
+        newUser.setHashSaltedPassword(values[1])
+        users.append(newUser)
 
 readUserFile()
 start_server()
-print('nonce '+str(users[0].getNonce()))
+print('nonce ' + str(users[0].generateNewNonce()))
 print('user '+str(users[0].username)+' pasword '+str(users[0].password)+' nonce '+str(users[0].nonce))

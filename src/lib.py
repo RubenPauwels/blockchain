@@ -113,8 +113,11 @@ def readUser(nodeNumber):
             with open(filename) as f:
                 content = f.readlines()
                 name = content[2].split('=')[1].translate({ord(c): None for c in ' \n"'})
+                salt = content[7].split('=')[1].translate({ord(c): None for c in ' \n"'})
                 secr = content[6].split('=')[1].translate({ord(c): None for c in ' \n"'})
-        return user(name,secr)
+                newUser = user(name)
+                newUser.setPasswordAndSalt(secr,salt)
+        return newUser
 
 
 def readUserName(nodeNumber):
@@ -199,14 +202,18 @@ class blockchain():
             return 0
 
     def controle_add(self, block_incomming):
-        # controle if block may be added, if yes add
-        if self.controle(block_incomming):
-            self.__add__(block_incomming)
-            return 1
-        else:
-            index = self.get_lastblock().index
-            print("blok not added, should be blok" + str(index + 1))
-            return 0
+        #no 2 threads can do this at the same time
+        with self.lock:
+            # controle if block may be added, if yes add
+            if self.controle(block_incomming):
+                self.__add__(block_incomming)
+                return 1
+            elif block_incomming.index==self.get_lastblock().index:
+                return 1
+            else:
+                index = self.get_lastblock().index
+                print("blok not added, should be blok" + str(index + 1))
+                return 0
     #make a block on top of the blockchain and set it on a waiting position until it can be add by calling 'addWaitingBlock'
     def setWaitingBlock(self, to, amount, NUMBER_NODE):
         lastBlock = self.get_lastblock()
@@ -256,26 +263,43 @@ class blockchain():
         print("---------------------------end of Blockchain------------------------------------")
         print("--------------------------------------------------------------------------------")
 
-#------------------------------------------------------USer--------------------------------------------------------------------
+#------------------------------------------------------USER--------------------------------------------------------------------
 class user():
-    def __init__(self,userName,password):
-        self.username=userName
-        self.password=password
+    def __init__(self, username):
+        self.username=username
         self.nonce = 0
 
-    def getNonce(self):
+    def setPasswordAndSalt(self,password,salt):
+        print("password:"+password)
+        print("salt:"+salt)
+        self.saltedPasswordHash = generateHash(password + salt)
+
+        print("saltedPasswordHash:"+self.saltedPasswordHash)
+
+    def setHashSaltedPassword(self, saltedUserNameHash):
+        self.saltedPasswordHash=saltedUserNameHash
+
+    def generateNewNonce(self):
         self.nonce =str(random.getrandbits(80))
         return self.nonce
 
-    def getHash(self):
-        return generateHash(self.password+self.nonce)
+    def getHashSaltedPassword(self):
+        return self.saltedPasswordHash
+
+    def getHashWithNonce(self):
+        return str(generateHash(self.saltedPasswordHash + self.nonce))
 
     def setNonce(self, nonce):
+        print("nonce:"+nonce)
         self.nonce = nonce
-        return self.getHash()
+        return self.getHashWithNonce()
 
     def check(self, hash):
-        return hash == self.getHash()
+        return hash == self.getHashWithNonce()
+
+
+
+
 
 #-------------------------identifiers for conversations---------------------------------------------
 from enum import Enum
@@ -292,7 +316,7 @@ class conversation(Enum):
     showBlockchain = "b"
 
 
-
+#https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
 def inputUser(text):
     return input("\x1b[47;30m"+ text+"\x1b[0m")
 
