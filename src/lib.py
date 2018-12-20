@@ -120,6 +120,17 @@ def readUser(nodeNumber):
         return newUser
 
 
+def readUserName(nodeNumber):
+    filename = "../config/host_node" + str(nodeNumber)
+    if not os.path.isfile(filename):
+        print("File does not exist " + filename)
+    else:
+        with open(filename) as f:
+            content = f.readlines()
+            name = content[2].split('=')[1].translate({ord(c): None for c in ' \n"'})
+    return name
+
+
 def blockToText(block):
     text =str(block.index)+'/'+str(block.amount)+'/'+str(block.timestamp)+'/'+str(block.receiver)+'/'+str(block.sender)\
           +'/'+str(block.prevHash)+'/'+str(block.hash)
@@ -156,8 +167,8 @@ class block():
         print("--  index\t\t"+str(self.index))
         print("--  amount\t\t"+str(self.amount))
         print("--  timestamp\t"+self.timestamp)
+        print("--  receiver\t" + self.receiver)
         print("--  sender\t\t"+self.sender)
-        print("--  receiver\t"+self.receiver)
         print("--  prevHash\t"+self.prevHash)
         print("--  hash\t\t"+self.hash)
 
@@ -204,10 +215,15 @@ class blockchain():
             print("blok not added, should be blok" + str(index + 1))
             return 0
     #make a block on top of the blockchain and set it on a waiting position until it can be add by calling 'addWaitingBlock'
-    def setWaitingBlock(self, to, amount):
+    def setWaitingBlock(self, to, amount, NUMBER_NODE):
         lastBlock = self.get_lastblock()
         dateTime = str(datetime.datetime.now())
-        self.blockWaitingToBeAdd = block(lastBlock.index + 1, amount, dateTime, 'me', to, lastBlock.hash)
+        # if (lastBlock.index == 0):
+        #     name = lastBlock.sender
+        # else:
+        #     name = readUserName(int(lastBlock.receiver))
+        name = readUserName(NUMBER_NODE)
+        self.blockWaitingToBeAdd = block(lastBlock.index + 1, amount, dateTime, to ,name, lastBlock.hash) #block(index,amount,time, RECEIVER, SENDER, hash)
         return self.blockWaitingToBeAdd
 
     #add the block that is waiting to ba add on top of the blockchain
@@ -298,7 +314,7 @@ class conversation(Enum):
 
 #https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
 def inputUser(text):
-    return input("\x1b[47;34m"+ text+"\x1b[0m")
+    return input("\x1b[47;30m"+ text+"\x1b[0m")
 
 def printUser(text):
-    print("\x1b[47;34m" + text + "\x1b[0m")
+    print("\x1b[47;30m" + text + "\x1b[0m")

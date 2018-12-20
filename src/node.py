@@ -32,15 +32,12 @@ def authentification():
     except:
         return 0
 
-
-
 def sendConfirmatioOfNewBlock(neighbor, accepted):
     if accepted:
         toSend = conversation.confirmNewBlock.value
     else:
         toSend = conversation.notConfirmNewBlock.value
     send_connection(neighbor.connection, toSend)
-
 def checkNeigborsResponse():
     evryoneAnswered=1
     answer=1
@@ -63,7 +60,6 @@ def checkNeigborsResponse():
                 if Neighbors[i].responseValue:
                     Thread(target=sendConfirmatioOfNewBlock, args=[Neighbors[i],accepted]).start()
 
-
 def start_conversation_client(ip, conversationEnumValue, contentFirstMessage=None):
     # open socket
     print('start soc with '+ip+':'+str(portNumber))
@@ -74,7 +70,6 @@ def start_conversation_client(ip, conversationEnumValue, contentFirstMessage=Non
     soc.connect((iPaddresssServer, portNumber))#ip4 and tcp
     send_connection(soc, conversationEnumValue+"/"+contentFirstMessage)  #send kind of conversation + first content of conversation
     return soc
-
 def sendBlocksToAllWithCheck(ip='optional'):
     #ip => ask not to this ip address
     #asking last index to neighbours
@@ -85,7 +80,6 @@ def sendBlocksToAllWithCheck(ip='optional'):
             Thread(target=sendNewBlockWithCheck, args=[ Neighbors[i]]).start()
         else:
             Neighbors[i].setTrue()
-
 def sendBlocksToAll(ip='optional'):
     #ip => ask not to this ip address
     #asking last index to neighbours
@@ -97,8 +91,6 @@ def sendBlocksToAll(ip='optional'):
             Thread(target=sendBlock, args=[ Neighbors[i]]).start()
         else:
             Neighbors[i].setTrue()
-
-
 
 #send a block that you have receive from one of your neighbors to your other neighbors. first you have to ask if they already have this new block or not
 def sendBlock(neighbor):
@@ -301,7 +293,7 @@ def main():
         else:
             amount = int(inputUser('how much do you want to give\n'))
             who = inputUser('to who\n')
-            BlockWaitingToBeAdd =  b.setWaitingBlock(who, amount)
+            BlockWaitingToBeAdd = b.setWaitingBlock(who, amount, NUMBER_NODE)
             sendBlocksToAllWithCheck()
 
 
