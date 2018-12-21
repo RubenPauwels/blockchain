@@ -1,5 +1,5 @@
 
-from lib import *
+from src.lib import *
 import socket
 # for handling task in separate jobs we need threading
 from threading import Thread

@@ -1,6 +1,6 @@
 import socket
 import random
-from lib import *
+from src.lib import *
 
 users = []
 

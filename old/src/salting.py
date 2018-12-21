@@ -1,7 +1,7 @@
 import os
 import random
-from lib import user
-from lib import readUser
+from src.lib import user
+from src.lib import readUser
 
 userFilePath = "../config/users.txt"
 userFile = open(userFilePath, "w")

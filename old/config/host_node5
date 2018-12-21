@@ -1,11 +1,11 @@
 [node5]
 ip_address = 127.0.5.1
-username = "Bert"
+username = "user5"
 
 [registration]
 ip_address = 127.0.0.10
-secret = "Berthispassword"
-salting = 211285753315358972186642987722
+secret = "unicorn"
+salting = 222818226431717646066063925279
 [neighbours]
 127.0.3.1
 127.0.4.1

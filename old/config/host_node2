@@ -1,11 +1,11 @@
 [node2]
 ip_address = 127.0.2.1
-username = "Ruben_Pauwels_VUB"
+username = "user2"
 
 [registration]
 ip_address = 127.0.0.10
-secret = "nikola666tesla"
-salting = 391421353321072528699327129961
+secret = "unicorn"
+salting = 355141632836121616996257570008
 [neighbours]
 127.0.1.1
 127.0.3.1
