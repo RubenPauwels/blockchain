@@ -13,7 +13,7 @@ BlockWaitingToBeAdd=None
 IpOfThisNode = readIp_node(NUMBER_NODE)
 
 
-#-----------------------------------------
+#-----------------------------------------authentification--------------------
 def authentification():
     try:
         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,6 +31,8 @@ def authentification():
         return answer==conversation.accepted.value
     except:
         return 0
+
+#-----------------------node as client--------------------
 
 def sendConfirmatioOfNewBlock(neighbor, accepted):
     if accepted:
@@ -154,7 +156,7 @@ def sendNewBlockWithCheck(neighbor):
         checkNeigborsResponse()
 
 
-#----------------------------serverside------------------------
+#----------------------------node as server------------------------
 def receiveBlock(conn, contentFirstMessage):
     # what received
     infolastBlock = contentFirstMessage
@@ -166,6 +168,7 @@ def receiveBlock(conn, contentFirstMessage):
 
     if int(content[0]) == b.get_lastblock().index and last4ofhashblockchain == content[1]:  # controll of last block of neigbor: hask + index
         tosend = conversation.ImUpToDate._value_
+
         send_connection(conn, tosend)
     else:
         tosend =  conversation.ImNotUpToDate._value_
@@ -177,6 +180,7 @@ def receiveBlock(conn, contentFirstMessage):
         if b.controle_add(blockIncoming):
             toSend=conversation.accepted._value_
             send_connection(conn, toSend)
+            printUser("an new block is aded to the blockchain by " + conn.getpeername()[0] + " press " + conversation.showBlockchain._value_ + " to see the blockchain")
             sendBlocksToAll(conn.getpeername()[0])
 
         else:
@@ -201,9 +205,11 @@ def validateCreatedBlock(conn, contentFirstMessage):
             #We add the block to our blockchain
             b.confirmWaitingBlock()
             #we distribute this new block to our neighbors (except to the neighbor that created the block)
-            sendBlocksToAll(conn.getpeername()[0])
+
             #the user is informd that a new block has been added to the chain
             printUser("an new block is aded to the blockchain by "+conn.getpeername()[0]+" press "+conversation.showBlockchain._value_+" to see the blockchain")
+            sendBlocksToAll(conn.getpeername()[0])
+
 
         # the final confirmation said that the block has NOT been approved by everyone
         else:

@@ -133,7 +133,7 @@ def readUserName(nodeNumber):
 
 def blockToText(block):
     text =str(block.index)+'/'+str(block.amount)+'/'+str(block.timestamp)+'/'+str(block.receiver)+'/'+str(block.sender)\
-          +'/'+str(block.prevHash)+'/'+str(block.hash)
+          +'/'+str(block.prevHash)
     return text
 def textToBlock(text):
     content = text.split('/')
