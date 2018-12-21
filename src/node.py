@@ -82,12 +82,16 @@ def sendBlocksToAllWithCheck(ip='optional'):
             Thread(target=sendNewBlockWithCheck, args=[ Neighbors[i]]).start()
         else:
             Neighbors[i].setTrue()
-def sendBlocksToAll(ip='optional'):
+
+#neighbos who already have the update
+ipAlreadyUpToDate =[]
+latestIndex=0
+def sendBlocksToAll():
     #ip => ask not to this ip address
-    #asking last index to neighbours
+
     #for not sending the same block 2 times
     for i in range(len(Neighbors)):
-        if Neighbors[i].ipAddress!=ip:# and neighbor[ip].connection ==None:
+        if not Neighbors[i].ipAddress in ipAlreadyUpToDate:# and neighbor[ip].connection ==None:
             Neighbors[i].reset()
 
             Thread(target=sendBlock, args=[ Neighbors[i]]).start()
@@ -158,6 +162,8 @@ def sendNewBlockWithCheck(neighbor):
 
 #----------------------------node as server------------------------
 def receiveBlock(conn, contentFirstMessage):
+    global latestIndex
+    ipAlreadyUpToDate.append(conn.getpeername()[0])
     # what received
     infolastBlock = contentFirstMessage
     content = infolastBlock.split('/')
@@ -168,7 +174,6 @@ def receiveBlock(conn, contentFirstMessage):
 
     if int(content[0]) == b.get_lastblock().index and last4ofhashblockchain == content[1]:  # controll of last block of neigbor: hask + index
         tosend = conversation.ImUpToDate._value_
-
         send_connection(conn, tosend)
     else:
         tosend =  conversation.ImNotUpToDate._value_
@@ -177,17 +182,24 @@ def receiveBlock(conn, contentFirstMessage):
 
         receive = read_connection(conn)
         blockIncoming = textToBlock(receive)
-        if b.controle_add(blockIncoming):
+        if blockIncoming.index<=latestIndex and b.controle(blockIncoming):
+            toSend = conversation.accepted._value_
+            send_connection(conn, toSend)
+        elif b.controle_add(blockIncoming):
+            latestIndex=latestIndex+1
+            ipAlreadyUpToDate.clear()
+            ipAlreadyUpToDate.append(conn.getpeername()[0])
             toSend=conversation.accepted._value_
             send_connection(conn, toSend)
             printUser("an new block is aded to the blockchain by " + conn.getpeername()[0] + " press " + conversation.showBlockchain._value_ + " to see the blockchain")
-            sendBlocksToAll(conn.getpeername()[0])
+            sendBlocksToAll()
 
         else:
             send=conversation.notAccepted._value_
             send_connection(conn, send)
 
 def validateCreatedBlock(conn, contentFirstMessage):
+    global latestIndex
     #the first message contains the created block as Text
     receivedBlockAsText = contentFirstMessage
 
@@ -208,7 +220,10 @@ def validateCreatedBlock(conn, contentFirstMessage):
 
             #the user is informd that a new block has been added to the chain
             printUser("an new block is aded to the blockchain by "+conn.getpeername()[0]+" press "+conversation.showBlockchain._value_+" to see the blockchain")
-            sendBlocksToAll(conn.getpeername()[0])
+            ipAlreadyUpToDate.clear()
+            ipAlreadyUpToDate.append(conn.getpeername()[0])
+            latestIndex= latestIndex + 1
+            sendBlocksToAll()
 
 
         # the final confirmation said that the block has NOT been approved by everyone
